@@ -57,8 +57,7 @@ jobs:
 
       - name: スクリーニングを実行
         env:
-          JQ_MAIL: ${{ secrets.JQ_MAIL }}
-          JQ_PASSWORD: ${{ secrets.JQ_PASSWORD }}
+          JQ_API_KEY: ${{ secrets.JQ_API_KEY }}
           CACHE_DIR: cache
         run: python scripts/run.py ${{ steps.mode.outputs.mode }}
 
