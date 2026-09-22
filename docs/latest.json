@@ -1,6 +1,6 @@
 {
  "meta": {
-  "updated_at": "2026-09-23T02:08:14+09:00",
+  "updated_at": "2026-09-23T02:34:01+09:00",
   "mode": "full",
   "universe": 3546,
   "price_date": "2026-09-18",
@@ -8,212 +8,3234 @@
  },
  "stocks": [
   {
+   "code": "8877",
+   "name": "エスリード",
+   "score": 105,
+   "price": 5240.0,
+   "per": 7.030442891068385,
+   "div_yield": 4.580152671755725,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
    "code": "9028",
    "name": "ゼロ",
-   "score": 75,
+   "score": 105,
    "price": 3310.0,
    "per": 7.61900377497468,
-   "div_yield": 4.238670694864049
+   "div_yield": 4.238670694864049,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3452",
+   "name": "ビーロット",
+   "score": 100,
+   "price": 1471.0,
+   "per": 5.541324493332329,
+   "div_yield": 5.438477226376614,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "4809",
+   "name": "パラカ",
+   "score": 100,
+   "price": 2026.0,
+   "per": 9.001643932998624,
+   "div_yield": 3.5538005923000986,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
   },
   {
    "code": "5285",
    "name": "ヤマックス",
-   "score": 70,
+   "score": 95,
    "price": 1343.0,
    "per": 7.794996807707935,
-   "div_yield": 4.467609828741623
+   "div_yield": 4.467609828741623,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
   },
   {
-   "code": "1928",
-   "name": "積水ハウス",
-   "score": 65,
-   "price": 3350.0,
-   "per": 9.69721530712673,
-   "div_yield": 4.328358208955224
+   "code": "9273",
+   "name": "コーア商事ホールディングス",
+   "score": 95,
+   "price": 757.0,
+   "per": 8.880807132801502,
+   "div_yield": 2.3778071334214,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4559",
+   "name": "ゼリア新薬工業",
+   "score": 95,
+   "price": 2018.0,
+   "per": 8.895353962796438,
+   "div_yield": 2.4777006937561943,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 10,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
   },
   {
    "code": "8844",
    "name": "コスモスイニシア",
-   "score": 65,
+   "score": 90,
    "price": 1243.0,
    "per": 5.841439917289346,
-   "div_yield": 4.263877715205148
+   "div_yield": 4.263877715205148,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "2337",
-   "name": "いちご",
-   "score": 60,
-   "price": 406.0,
-   "per": 8.856893542757417,
-   "div_yield": 3.8177339901477834
+   "code": "6877",
+   "name": "ＯＢＡＲＡ　ＧＲＯＵＰ",
+   "score": 90,
+   "price": 5220.0,
+   "per": 9.900051207161416,
+   "div_yield": 2.8735632183908044,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
   },
   {
-   "code": "1952",
-   "name": "新日本空調",
-   "score": 60,
-   "price": 3240.0,
-   "per": 11.510586897825778,
-   "div_yield": 3.7037037037037033
+   "code": "3482",
+   "name": "ロードスターキャピタル",
+   "score": 85,
+   "price": 2577.0,
+   "per": 4.748217345641479,
+   "div_yield": 3.802871556072953,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 5,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "2674",
-   "name": "ハードオフコーポレーション",
-   "score": 60,
-   "price": 2595.0,
-   "per": 10.94059614654918,
-   "div_yield": 3.5452793834296727
+   "code": "8927",
+   "name": "明豊エンタープライズ",
+   "score": 85,
+   "price": 500.0,
+   "per": 5.465078150617554,
+   "div_yield": 3.0,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 5,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "9142",
-   "name": "九州旅客鉄道",
-   "score": 60,
-   "price": 3461.0,
-   "per": 10.321483955624478,
-   "div_yield": 3.496099393238948
+   "code": "3289",
+   "name": "東急不動産ホールディングス",
+   "score": 85,
+   "price": 1280.0,
+   "per": 9.129163397760502,
+   "div_yield": 3.90625,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "6357",
+   "name": "三精テクノロジーズ",
+   "score": 85,
+   "price": 2773.0,
+   "per": 9.273317058489116,
+   "div_yield": 3.425892535160476,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "2498",
+   "name": "オリエンタルコンサルタンツホールディングス",
+   "score": 85,
+   "price": 3140.0,
+   "per": 9.386583761807964,
+   "div_yield": 4.140127388535031,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9416",
+   "name": "ビジョン",
+   "score": 85,
+   "price": 1069.0,
+   "per": 10.004679457182966,
+   "div_yield": 4.770813844714686,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2359",
+   "name": "コア",
+   "score": 85,
+   "price": 2122.0,
+   "per": 10.159915733026907,
+   "div_yield": 3.0631479736098024,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9045",
+   "name": "京阪ホールディングス",
+   "score": 85,
+   "price": 3224.0,
+   "per": 11.217424585087505,
+   "div_yield": 2.6674937965260543,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "7373",
+   "name": "アイドマ・ホールディングス",
+   "score": 85,
+   "price": 912.0,
+   "per": 11.301115241635687,
+   "div_yield": 3.289473684210526,
+   "points": {
+    "per": 20,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
   },
   {
    "code": "3300",
    "name": "アンビション　ＤＸ　ホールディングス",
-   "score": 55,
+   "score": 80,
    "price": 1893.0,
    "per": 5.402705633883213,
-   "div_yield": 5.810882197569995
-  },
-  {
-   "code": "1975",
-   "name": "朝日工業社",
-   "score": 55,
-   "price": 3915.0,
-   "per": 10.951661631419938,
-   "div_yield": 3.67816091954023
-  },
-  {
-   "code": "7972",
-   "name": "イトーキ",
-   "score": 55,
-   "price": 2492.0,
-   "per": 11.007067137809187,
-   "div_yield": 3.611556982343499
-  },
-  {
-   "code": "6858",
-   "name": "小野測器",
-   "score": 55,
-   "price": 834.0,
-   "per": 10.807308539587922,
-   "div_yield": 3.597122302158273
-  },
-  {
-   "code": "6498",
-   "name": "キッツ",
-   "score": 55,
-   "price": 1973.0,
-   "per": 12.810856437893644,
-   "div_yield": 3.1424227065382664
+   "div_yield": 5.810882197569995,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
   },
   {
    "code": "7130",
    "name": "ヤマエグループホールディングス",
-   "score": 55,
+   "score": 80,
    "price": 2809.0,
    "per": 6.248053739045331,
-   "div_yield": 2.847988608045568
+   "div_yield": 2.847988608045568,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 5,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "2875",
-   "name": "東洋水産",
-   "score": 55,
-   "price": 9737.0,
-   "per": 14.390647630871095,
-   "div_yield": 2.259422820170484
+   "code": "8789",
+   "name": "フィンテック　グローバル",
+   "score": 80,
+   "price": 162.0,
+   "per": 6.781079949769778,
+   "div_yield": 3.0864197530864197,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
   },
   {
-   "code": "9022",
-   "name": "東海旅客鉄道",
-   "score": 55,
-   "price": 3815.0,
-   "per": 8.108395324123274,
-   "div_yield": 0.8387942332896461
+   "code": "2982",
+   "name": "ＡＤワークスグループ",
+   "score": 80,
+   "price": 431.0,
+   "per": 6.8926915080761235,
+   "div_yield": 4.640371229698376,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "7606",
-   "name": "ユナイテッドアローズ",
-   "score": 50,
-   "price": 2386.0,
-   "per": 10.620493189708894,
-   "div_yield": 4.694048616932104
+   "code": "7235",
+   "name": "東京ラヂエーター製造",
+   "score": 80,
+   "price": 1590.0,
+   "per": 8.410473419730229,
+   "div_yield": 4.8427672955974845,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 0,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
   },
   {
-   "code": "8227",
-   "name": "しまむら",
-   "score": 50,
-   "price": 3185.0,
-   "per": 13.975427819218956,
-   "div_yield": 2.511773940345369
+   "code": "2337",
+   "name": "いちご",
+   "score": 80,
+   "price": 406.0,
+   "per": 8.856893542757417,
+   "div_yield": 3.8177339901477834,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "4901",
-   "name": "富士フイルムホールディングス",
-   "score": 50,
-   "price": 3324.0,
-   "per": 14.193603484350314,
-   "div_yield": 2.256317689530686
+   "code": "4430",
+   "name": "東海ソフト",
+   "score": 80,
+   "price": 1746.0,
+   "per": 9.306044131755677,
+   "div_yield": 3.436426116838488,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4685",
+   "name": "菱友システムズ",
+   "score": 80,
+   "price": 2715.0,
+   "per": 9.626976810155309,
+   "div_yield": 3.683241252302026,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "1928",
+   "name": "積水ハウス",
+   "score": 80,
+   "price": 3350.0,
+   "per": 9.69721530712673,
+   "div_yield": 4.328358208955224,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6835",
+   "name": "アライドテレシスホールディングス",
+   "score": 80,
+   "price": 273.0,
+   "per": 9.767441860465116,
+   "div_yield": 3.296703296703297,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "1835",
+   "name": "東鉄工業",
+   "score": 80,
+   "price": 3960.0,
+   "per": 10.491455821963175,
+   "div_yield": 3.8383838383838382,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9830",
+   "name": "トラスコ中山",
+   "score": 80,
+   "price": 2423.0,
+   "per": 10.561876116995771,
+   "div_yield": 2.5175402393726785,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "3817",
+   "name": "ＳＲＡホールディングス",
+   "score": 80,
+   "price": 4775.0,
+   "per": 10.968438461891855,
+   "div_yield": 4.607329842931937,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2749",
+   "name": "ＪＰホールディングス",
+   "score": 80,
+   "price": 675.0,
+   "per": 13.31623594397317,
+   "div_yield": 2.0,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "7937",
+   "name": "ツツミ",
+   "score": 80,
+   "price": 2564.0,
+   "per": 14.309632771514677,
+   "div_yield": 4.485179407176288,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2986",
+   "name": "ＬＡホールディングス",
+   "score": 75,
+   "price": 2955.0,
+   "per": 5.842576665282639,
+   "div_yield": 11.336717428087987,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "3733",
+   "name": "ソフトウェア・サービス",
+   "score": 75,
+   "price": 11880.0,
+   "per": 9.021734177791954,
+   "div_yield": 1.430976430976431,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3139",
+   "name": "ラクト・ジャパン",
+   "score": 75,
+   "price": 3455.0,
+   "per": 10.02524446507849,
+   "div_yield": 3.8205499276410997,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9142",
+   "name": "九州旅客鉄道",
+   "score": 75,
+   "price": 3461.0,
+   "per": 10.321483955624478,
+   "div_yield": 3.496099393238948,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "2674",
+   "name": "ハードオフコーポレーション",
+   "score": 75,
+   "price": 2595.0,
+   "per": 10.94059614654918,
+   "div_yield": 3.5452793834296727,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2001",
+   "name": "ニップン",
+   "score": 75,
+   "price": 2979.0,
+   "per": 11.615846525774002,
+   "div_yield": 2.282645182947298,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 10,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "8914",
+   "name": "エリアリンク",
+   "score": 75,
+   "price": 879.0,
+   "per": 11.72468987595038,
+   "div_yield": 3.128555176336746,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6005",
+   "name": "三浦工業",
+   "score": 75,
+   "price": 3154.0,
+   "per": 12.805521721477872,
+   "div_yield": 2.346227013316424,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6432",
+   "name": "竹内製作所",
+   "score": 75,
+   "price": 7280.0,
+   "per": 12.9851598173516,
+   "div_yield": 3.021978021978022,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2418",
+   "name": "ツカダ・グローバルホールディング",
+   "score": 70,
+   "price": 597.0,
+   "per": 4.669899874843554,
+   "div_yield": 2.3450586264656614,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 10,
+    "operating_margin": 5,
+    "profit_cagr": 0,
+    "dividend_yield": 10,
+    "payout_ratio": 5,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "4414",
+   "name": "フレクト",
+   "score": 70,
+   "price": 1101.0,
+   "per": 7.937423401340927,
+   "div_yield": 0.0,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 0,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9908",
+   "name": "日本電計",
+   "score": 70,
+   "price": 2950.0,
+   "per": 9.568912387686918,
+   "div_yield": 3.694915254237288,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "4662",
+   "name": "フォーカスシステムズ",
+   "score": 70,
+   "price": 1632.0,
+   "per": 9.717756341550555,
+   "div_yield": 4.166666666666666,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2742",
+   "name": "ハローズ",
+   "score": 70,
+   "price": 3965.0,
+   "per": 9.775882048373974,
+   "div_yield": 1.815889029003783,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "3232",
+   "name": "三重交通グループホールディングス",
+   "score": 70,
+   "price": 610.0,
+   "per": 10.219467247445134,
+   "div_yield": 3.278688524590164,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "8804",
+   "name": "東京建物",
+   "score": 70,
+   "price": 3236.0,
+   "per": 10.312300828553218,
+   "div_yield": 3.8936959208899875,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9699",
+   "name": "ニシオホールディングス",
+   "score": 70,
+   "price": 4715.0,
+   "per": 10.729809070841773,
+   "div_yield": 2.799575821845175,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 5,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "1964",
+   "name": "中外炉工業",
+   "score": 70,
+   "price": 3930.0,
+   "per": 10.90515566901604,
+   "div_yield": 4.580152671755725,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "7972",
+   "name": "イトーキ",
+   "score": 70,
+   "price": 2492.0,
+   "per": 11.007067137809187,
+   "div_yield": 3.611556982343499,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6785",
+   "name": "鈴木",
+   "score": 70,
+   "price": 3130.0,
+   "per": 11.292708446080022,
+   "div_yield": 3.3546325878594248,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "7608",
+   "name": "エスケイジャパン",
+   "score": 70,
+   "price": 932.0,
+   "per": 11.432777232580962,
+   "div_yield": 2.575107296137339,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6653",
+   "name": "正興電機製作所",
+   "score": 70,
+   "price": 2114.0,
+   "per": 11.448066717210008,
+   "div_yield": 2.838221381267739,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6231",
+   "name": "木村工機",
+   "score": 70,
+   "price": 11990.0,
+   "per": 12.21412927214384,
+   "div_yield": 1.6680567139282736,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "1965",
+   "name": "テクノ菱和",
+   "score": 70,
+   "price": 7130.0,
+   "per": 12.391810629497028,
+   "div_yield": 2.3842917251051894,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3148",
+   "name": "クリエイトＳＤホールディングス",
+   "score": 70,
+   "price": 3300.0,
+   "per": 12.54037621128634,
+   "div_yield": 2.727272727272727,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4931",
+   "name": "新日本製薬",
+   "score": 70,
+   "price": 2041.0,
+   "per": 12.71651090342679,
+   "div_yield": 2.792748652621264,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4481",
+   "name": "ベース",
+   "score": 70,
+   "price": 3245.0,
+   "per": 12.907203372976413,
+   "div_yield": 5.731895223420647,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 15,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
   },
   {
    "code": "9042",
    "name": "阪急阪神ホールディングス",
-   "score": 50,
+   "score": 70,
    "price": 4612.0,
    "per": 13.564306932149055,
-   "div_yield": 2.168256721595837
+   "div_yield": 2.168256721595837,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "4403",
-   "name": "日油",
-   "score": 45,
-   "price": 2588.5,
-   "per": 14.915869540163651,
-   "div_yield": 2.7042688815916556
+   "code": "5032",
+   "name": "ＡＮＹＣＯＬＯＲ",
+   "score": 70,
+   "price": 3110.0,
+   "per": 13.876494734963412,
+   "div_yield": 1.9935691318327973,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6674",
+   "name": "ジーエス・ユアサ　コーポレーション",
+   "score": 70,
+   "price": 5476.0,
+   "per": 13.907654797582161,
+   "div_yield": 1.789627465303141,
+   "points": {
+    "per": 15,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "2875",
+   "name": "東洋水産",
+   "score": 70,
+   "price": 9737.0,
+   "per": 14.390647630871095,
+   "div_yield": 2.259422820170484,
+   "points": {
+    "per": 10,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
   },
   {
    "code": "7522",
    "name": "ワタミ",
-   "score": 45,
+   "score": 65,
    "price": 908.0,
    "per": 6.968534151957022,
-   "div_yield": 1.1013215859030838
+   "div_yield": 1.1013215859030838,
+   "points": {
+    "per": 30,
+    "drawdown": 5,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
   },
   {
-   "code": "1812",
-   "name": "鹿島建設",
-   "score": 40,
-   "price": 4979.0,
-   "per": 13.494322031601484,
-   "div_yield": 2.9323157260494077
+   "code": "7047",
+   "name": "ポート",
+   "score": 65,
+   "price": 2187.0,
+   "per": 8.667564996829423,
+   "div_yield": 0.594421582075903,
+   "points": {
+    "per": 30,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "9551",
-   "name": "メタウォーター",
-   "score": 35,
-   "price": 3080.0,
-   "per": 13.447432762836186,
-   "div_yield": 2.5974025974025974
+   "code": "3679",
+   "name": "じげん",
+   "score": 65,
+   "price": 450.0,
+   "per": 10.180995475113122,
+   "div_yield": 3.0,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "7466",
+   "name": "ＳＰＫ",
+   "score": 65,
+   "price": 1466.0,
+   "per": 10.843997337081145,
+   "div_yield": 2.7967257844474758,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "8923",
+   "name": "トーセイ",
+   "score": 65,
+   "price": 1724.0,
+   "per": 11.056952283222166,
+   "div_yield": 3.1902552204176335,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9025",
+   "name": "鴻池運輸",
+   "score": 65,
+   "price": 2965.0,
+   "per": 11.245543502996282,
+   "div_yield": 3.709949409780776,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "9003",
+   "name": "相鉄ホールディングス",
+   "score": 65,
+   "price": 2635.0,
+   "per": 11.44259162758381,
+   "div_yield": 2.6565464895635675,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "1952",
+   "name": "新日本空調",
+   "score": 65,
+   "price": 3240.0,
+   "per": 11.510586897825778,
+   "div_yield": 3.7037037037037033,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6364",
+   "name": "ＡＩＲＭＡＮ",
+   "score": 65,
+   "price": 2591.0,
+   "per": 11.63553080653853,
+   "div_yield": 2.7788498649170204,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9974",
+   "name": "ベルク",
+   "score": 65,
+   "price": 7000.0,
+   "per": 11.908204753074868,
+   "div_yield": 1.8857142857142857,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "7595",
+   "name": "アルゴグラフィックス",
+   "score": 65,
+   "price": 1287.0,
+   "per": 12.285223367697593,
+   "div_yield": 5.05050505050505,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3569",
+   "name": "セーレン",
+   "score": 65,
+   "price": 3320.0,
+   "per": 12.399163429937257,
+   "div_yield": 2.289156626506024,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2209",
+   "name": "井村屋グループ",
+   "score": 65,
+   "price": 2359.0,
+   "per": 12.57864988802389,
+   "div_yield": 1.6108520559559136,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6309",
+   "name": "巴工業",
+   "score": 65,
+   "price": 1987.0,
+   "per": 13.273213092852373,
+   "div_yield": 3.824861600402617,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 10,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3201",
+   "name": "日本毛織",
+   "score": 65,
+   "price": 1983.0,
+   "per": 13.595228301110653,
+   "div_yield": 2.5214321734745337,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 5,
+    "profit_cagr": 0,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3580",
+   "name": "小松マテーレ",
+   "score": 65,
+   "price": 761.0,
+   "per": 14.31258228324243,
+   "div_yield": 3.5479632063074904,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9837",
+   "name": "モリト",
+   "score": 65,
+   "price": 1793.0,
+   "per": 14.925497377840673,
+   "div_yield": 4.015616285554936,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3923",
+   "name": "ラクス",
+   "score": 65,
+   "price": 1082.0,
+   "per": 15.205171444631816,
+   "div_yield": 0.7393715341959335,
+   "points": {
+    "per": 10,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3854",
+   "name": "アイル",
+   "score": 65,
+   "price": 2163.0,
+   "per": 15.249576988155669,
+   "div_yield": 3.0513176144244105,
+   "points": {
+    "per": 10,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6237",
+   "name": "イワキ",
+   "score": 65,
+   "price": 3925.0,
+   "per": 16.909357229019474,
+   "div_yield": 2.343949044585987,
+   "points": {
+    "per": 0,
+    "drawdown": 15,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9619",
+   "name": "イチネンホールディングス",
+   "score": 60,
+   "price": 2742.0,
+   "per": 5.454328453214512,
+   "div_yield": 3.282275711159737,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 5,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "1435",
+   "name": "ｒｏｂｏｔ　ｈｏｍｅ",
+   "score": 60,
+   "price": 182.0,
+   "per": 8.085295424255886,
+   "div_yield": 1.098901098901099,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "7606",
+   "name": "ユナイテッドアローズ",
+   "score": 60,
+   "price": 2386.0,
+   "per": 10.620493189708894,
+   "div_yield": 4.694048616932104,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "9692",
+   "name": "シーイーシー",
+   "score": 60,
+   "price": 2223.0,
+   "per": 11.551652463105384,
+   "div_yield": 3.8236617183985606,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3836",
+   "name": "アバントグループ",
+   "score": 60,
+   "price": 1223.0,
+   "per": 12.214121641865574,
+   "div_yield": 2.616516762060507,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4709",
+   "name": "ＩＤホールディングス",
+   "score": 60,
+   "price": 1092.0,
+   "per": 12.36833163438668,
+   "div_yield": 4.5787545787545785,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "8593",
+   "name": "三菱ＨＣキャピタル",
+   "score": 60,
+   "price": 1384.5,
+   "per": 12.407025719150461,
+   "div_yield": 3.683640303358613,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "6498",
+   "name": "キッツ",
+   "score": 60,
+   "price": 1973.0,
+   "per": 12.810856437893644,
+   "div_yield": 3.1424227065382664,
+   "points": {
+    "per": 15,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
   },
   {
    "code": "8830",
    "name": "住友不動産",
-   "score": 35,
+   "score": 60,
    "price": 3186.0,
    "per": 13.196371619102845,
-   "div_yield": 1.6321406151914626
+   "div_yield": 1.6321406151914626,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 5,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
   },
   {
-   "code": "9267",
-   "name": "Ｇｅｎｋｙ　ＤｒｕｇＳｔｏｒｅｓ",
+   "code": "9989",
+   "name": "サンドラッグ",
+   "score": 60,
+   "price": 3629.0,
+   "per": 13.20452643452316,
+   "div_yield": 3.637365665472582,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "1812",
+   "name": "鹿島建設",
+   "score": 60,
+   "price": 4979.0,
+   "per": 13.494322031601484,
+   "div_yield": 2.9323157260494077,
+   "points": {
+    "per": 15,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6071",
+   "name": "ＩＢＪ",
+   "score": 60,
+   "price": 912.0,
+   "per": 13.708101608297008,
+   "div_yield": 2.083333333333333,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "4612",
+   "name": "日本ペイントホールディングス",
+   "score": 60,
+   "price": 1152.5,
+   "per": 14.144575355915562,
+   "div_yield": 1.475054229934924,
+   "points": {
+    "per": 10,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "7906",
+   "name": "ヨネックス",
+   "score": 60,
+   "price": 2349.0,
+   "per": 14.152307506928546,
+   "div_yield": 1.191996594295445,
+   "points": {
+    "per": 10,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6637",
+   "name": "寺崎電気産業",
+   "score": 60,
+   "price": 4380.0,
+   "per": 14.287112241902339,
+   "div_yield": 1.2785388127853883,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9044",
+   "name": "ＮＡＮＫＡＩ",
+   "score": 60,
+   "price": 3177.0,
+   "per": 14.443535188216039,
+   "div_yield": 1.7311929493232607,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "2163",
+   "name": "アルトナー",
+   "score": 60,
+   "price": 954.0,
+   "per": 16.205197893664007,
+   "div_yield": 9.014675052410901,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3984",
+   "name": "ユーザーローカル",
+   "score": 60,
+   "price": 1567.0,
+   "per": 16.39979068550497,
+   "div_yield": 1.5315890236119976,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "1942",
+   "name": "関電工",
+   "score": 60,
+   "price": 5543.0,
+   "per": 16.971311349928047,
+   "div_yield": 2.345300378856215,
+   "points": {
+    "per": 0,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4071",
+   "name": "プラスアルファ・コンサルティング",
+   "score": 60,
+   "price": 2100.0,
+   "per": 17.126080574131464,
+   "div_yield": 2.380952380952381,
+   "points": {
+    "per": 0,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4058",
+   "name": "トヨクモ",
+   "score": 60,
+   "price": 2357.0,
+   "per": 18.244446164563822,
+   "div_yield": 1.1455239711497667,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "5930",
+   "name": "文化シヤッター",
+   "score": 55,
+   "price": 1917.0,
+   "per": 10.37225408505573,
+   "div_yield": 3.8601982263954095,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "4168",
+   "name": "ヤプリ",
+   "score": 55,
+   "price": 804.0,
+   "per": 11.124948111249482,
+   "div_yield": 1.8656716417910446,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 5,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4220",
+   "name": "リケンテクノス",
+   "score": 55,
+   "price": 2363.0,
+   "per": 11.71658072193574,
+   "div_yield": 3.597122302158273,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "8074",
+   "name": "ＹＵＡＳＡ",
+   "score": 55,
+   "price": 6400.0,
+   "per": 11.719250700408342,
+   "div_yield": 2.96875,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "3153",
+   "name": "八洲電機",
+   "score": 55,
+   "price": 3265.0,
+   "per": 12.645726015724854,
+   "div_yield": 1.7151607963246556,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "4345",
+   "name": "シーティーエス",
+   "score": 55,
+   "price": 844.0,
+   "per": 12.770464518081404,
+   "div_yield": 3.5545023696682465,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "5602",
+   "name": "栗本鐵工所",
+   "score": 55,
+   "price": 1584.0,
+   "per": 12.82072035613112,
+   "div_yield": 3.787878787878788,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4390",
+   "name": "アイ・ピー・エス",
+   "score": 55,
+   "price": 4115.0,
+   "per": 12.843320848938827,
+   "div_yield": 0.9720534629404617,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "8037",
+   "name": "カメイ",
+   "score": 55,
+   "price": 5080.0,
+   "per": 12.899949212798374,
+   "div_yield": 2.677165354330709,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 10,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "9551",
+   "name": "メタウォーター",
+   "score": 55,
+   "price": 3080.0,
+   "per": 13.447432762836186,
+   "div_yield": 2.5974025974025974,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6850",
+   "name": "チノー",
+   "score": 55,
+   "price": 1783.0,
+   "per": 13.693264726211504,
+   "div_yield": 3.365114974761638,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "3221",
+   "name": "ヨシックスホールディングス",
+   "score": 55,
+   "price": 3210.0,
+   "per": 13.955308234066603,
+   "div_yield": 0.9968847352024922,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "2353",
+   "name": "日本駐車場開発",
+   "score": 55,
+   "price": 272.0,
+   "per": 14.12987012987013,
+   "div_yield": 3.308823529411765,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "2477",
+   "name": "手間いらず",
+   "score": 55,
+   "price": 3380.0,
+   "per": 15.011547344110856,
+   "div_yield": 1.183431952662722,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6547",
+   "name": "グリーンズ",
+   "score": 50,
+   "price": 2144.0,
+   "per": 6.543767549749726,
+   "div_yield": 2.425373134328358,
+   "points": {
+    "per": 30,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 0,
+    "dividend_yield": 10,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "7318",
+   "name": "セレンディップ・ホールディングス",
+   "score": 50,
+   "price": 1351.0,
+   "per": 11.201392919326755,
+   "div_yield": 0.0,
+   "points": {
+    "per": 20,
+    "drawdown": 15,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 0,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "3107",
+   "name": "ダイワボウホールディングス",
+   "score": 50,
+   "price": 3737.0,
+   "per": 12.750784768663847,
+   "div_yield": 2.9435375970029436,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "4396",
+   "name": "システムサポートホールディングス",
+   "score": 50,
+   "price": 1393.0,
+   "per": 13.313581190863042,
+   "div_yield": 3.5175879396984926,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "2980",
+   "name": "ＳＲＥホールディングス",
+   "score": 50,
+   "price": 2351.0,
+   "per": 13.402120624786228,
+   "div_yield": 0.8507018290089324,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "8066",
+   "name": "三谷商事",
+   "score": 50,
+   "price": 3600.0,
+   "per": 14.187192118226601,
+   "div_yield": 2.4444444444444446,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "1969",
+   "name": "高砂熱学工業",
+   "score": 50,
+   "price": 4713.0,
+   "per": 15.422120418848166,
+   "div_yield": 2.609802673456397,
+   "points": {
+    "per": 10,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "4617",
+   "name": "中国塗料",
+   "score": 50,
+   "price": 3535.0,
+   "per": 15.944251499706823,
+   "div_yield": 2.828854314002829,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6745",
+   "name": "ホーチキ",
+   "score": 50,
+   "price": 1977.0,
+   "per": 16.38759946949602,
+   "div_yield": 2.0232675771370765,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "7818",
+   "name": "トランザクション",
+   "score": 50,
+   "price": 1244.0,
+   "per": 16.463737427210162,
+   "div_yield": 2.491961414790997,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 5,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6564",
+   "name": "ミダックホールディングス",
+   "score": 50,
+   "price": 2000.0,
+   "per": 16.565890830779423,
+   "div_yield": 1.0,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "3939",
+   "name": "カナミックネットワーク",
+   "score": 50,
+   "price": 495.0,
+   "per": 17.14582611707655,
+   "div_yield": 1.8181818181818181,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 15,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "8060",
+   "name": "キヤノンマーケティングジャパン",
+   "score": 50,
+   "price": 3689.0,
+   "per": 17.27059925093633,
+   "div_yield": 2.5752236378422335,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "7745",
+   "name": "Ａ＆Ｄホロンホールディングス",
+   "score": 50,
+   "price": 2894.0,
+   "per": 17.613048505873046,
+   "div_yield": 2.073255010366275,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "8511",
+   "name": "日本証券金融",
+   "score": 50,
+   "price": 2507.0,
+   "per": 18.451460955324944,
+   "div_yield": 3.749501396090946,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 5,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9211",
+   "name": "エフ・コード",
+   "score": 45,
+   "price": 1558.0,
+   "per": 10.068502003360475,
+   "div_yield": 0.0,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 0,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9928",
+   "name": "ミロク情報サービス",
+   "score": 45,
+   "price": 2036.0,
+   "per": 12.67509182593538,
+   "div_yield": 3.192534381139489,
+   "points": {
+    "per": 15,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9934",
+   "name": "因幡電機産業",
+   "score": 45,
+   "price": 3097.0,
+   "per": 14.678420778235935,
+   "div_yield": 2.7445915402001937,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3989",
+   "name": "シェアリングテクノロジー",
+   "score": 45,
+   "price": 1545.0,
+   "per": 14.78893462237963,
+   "div_yield": 1.779935275080906,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3626",
+   "name": "ＴＩＳＩ",
+   "score": 45,
+   "price": 4083.0,
+   "per": 15.037566293459045,
+   "div_yield": 2.2042615723732553,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6351",
+   "name": "鶴見製作所",
+   "score": 45,
+   "price": 2569.0,
+   "per": 16.69916796671867,
+   "div_yield": 1.401323472168159,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "7085",
+   "name": "カーブスホールディングス",
+   "score": 45,
+   "price": 889.0,
+   "per": 16.881883782757313,
+   "div_yield": 3.374578177727784,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "8252",
+   "name": "丸井グループ",
+   "score": 45,
+   "price": 2882.5,
+   "per": 17.480291085506366,
+   "div_yield": 4.648742411101474,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 15,
+    "operating_margin": 10,
+    "profit_cagr": 5,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "1878",
+   "name": "大東建託",
+   "score": 40,
+   "price": 3352.0,
+   "per": 10.124441222665217,
+   "div_yield": 4.862768496420048,
+   "points": {
+    "per": 20,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 5,
+    "dividend_yield": 15,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9722",
+   "name": "藤田観光",
+   "score": 40,
+   "price": 2813.0,
+   "per": 13.488372093023255,
+   "div_yield": 0.7109847138286527,
+   "points": {
+    "per": 15,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "2157",
+   "name": "コシダカホールディングス",
+   "score": 40,
+   "price": 1003.0,
+   "per": 15.381076522005829,
+   "div_yield": 2.7916251246261217,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 10,
+    "profit_cagr": 0,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "1944",
+   "name": "きんでん",
+   "score": 40,
+   "price": 6929.0,
+   "per": 16.28131021194605,
+   "div_yield": 3.463703276086015,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "9759",
+   "name": "ＮＳＤ",
+   "score": 40,
+   "price": 2912.0,
+   "per": 16.828478964401295,
+   "div_yield": 3.331043956043956,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "5805",
+   "name": "ＳＷＣＣ",
+   "score": 40,
+   "price": 13120.0,
+   "per": 16.89785299383074,
+   "div_yield": 2.370426829268293,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6058",
+   "name": "ベクトル",
+   "score": 40,
+   "price": 1984.0,
+   "per": 16.919665700153505,
+   "div_yield": 1.8145161290322582,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "4718",
+   "name": "早稲田アカデミー",
+   "score": 40,
+   "price": 2533.0,
+   "per": 17.035442867711346,
+   "div_yield": 2.9609159099881563,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6504",
+   "name": "富士電機",
+   "score": 40,
+   "price": 13075.0,
+   "per": 17.119700421609448,
+   "div_yield": 1.5296367112810707,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "6570",
+   "name": "共和コーポレーション",
+   "score": 40,
+   "price": 3500.0,
+   "per": 17.172014522617996,
+   "div_yield": 1.1428571428571428,
+   "points": {
+    "per": 0,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "4194",
+   "name": "ビジョナル",
+   "score": 40,
+   "price": 8504.0,
+   "per": 18.54258427456282,
+   "div_yield": 0.0,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 0,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6247",
+   "name": "日阪製作所",
+   "score": 40,
+   "price": 1719.0,
+   "per": 18.75409120663321,
+   "div_yield": 3.1995346131471787,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "4290",
+   "name": "プレステージ・インターナショナル",
+   "score": 35,
+   "price": 708.0,
+   "per": 14.930409110080134,
+   "div_yield": 3.954802259887006,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "9746",
+   "name": "ＴＫＣ",
+   "score": 35,
+   "price": 4160.0,
+   "per": 16.008620026167936,
+   "div_yield": 3.0288461538461537,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 5,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3661",
+   "name": "エムアップホールディングス",
+   "score": 35,
+   "price": 809.0,
+   "per": 16.06433677521843,
+   "div_yield": 2.966625463535229,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "7552",
+   "name": "ハピネット",
+   "score": 35,
+   "price": 4075.0,
+   "per": 16.815218288355204,
+   "div_yield": 1.2269938650306749,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "2212",
+   "name": "山崎製パン",
+   "score": 35,
+   "price": 3647.0,
+   "per": 16.89677538917717,
+   "div_yield": 1.6451878256100905,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "3087",
+   "name": "ドトール・日レスホールディングス",
+   "score": 35,
+   "price": 3265.0,
+   "per": 18.158055725488015,
+   "div_yield": 1.8376722817764166,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 10,
+    "pbr": 5,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "6947",
+   "name": "図研",
+   "score": 35,
+   "price": 5020.0,
+   "per": 18.561656498428547,
+   "div_yield": 2.9880478087649402,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "3491",
+   "name": "ＧＡ　ｔｅｃｈｎｏｌｏｇｉｅｓ",
+   "score": 30,
+   "price": 1345.0,
+   "per": 10.112781954887218,
+   "div_yield": 0.966542750929368,
+   "points": {
+    "per": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 0,
+    "dividend_yield": 5,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "8848",
+   "name": "レオパレス２１",
+   "score": 30,
+   "price": 1040.0,
+   "per": 15.441722345953973,
+   "div_yield": 0.0,
+   "points": {
+    "per": 10,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 0,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "7287",
+   "name": "日本精機",
+   "score": 30,
+   "price": 2813.0,
+   "per": 16.169454503650055,
+   "div_yield": 3.1994312122289372,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 0,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 10,
+    "equity_ratio": 10
+   }
+  },
+  {
+   "code": "9278",
+   "name": "ブックオフグループホールディングス",
+   "score": 30,
+   "price": 2732.0,
+   "per": 17.126379137412236,
+   "div_yield": 1.0980966325036603,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "6208",
+   "name": "石川製作所",
+   "score": 30,
+   "price": 1820.0,
+   "per": 17.737062664457657,
+   "div_yield": 1.098901098901099,
+   "points": {
+    "per": 0,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 15,
+    "dividend_yield": 5,
+    "payout_ratio": 5,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "3762",
+   "name": "テクマトリックス",
+   "score": 30,
+   "price": 2532.0,
+   "per": 18.913871666542168,
+   "div_yield": 2.132701421800948,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "9069",
+   "name": "センコーグループホールディングス",
+   "score": 25,
+   "price": 2367.5,
+   "per": 16.97132616487455,
+   "div_yield": 2.365364308342133,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 5,
+    "operating_margin": 0,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
+   "code": "3395",
+   "name": "サンマルクホールディングス",
+   "score": 25,
+   "price": 2535.0,
+   "per": 18.73752679429374,
+   "div_yield": 2.130177514792899,
+   "points": {
+    "per": 0,
+    "drawdown": 0,
+    "range_days": 0,
+    "operating_margin": 0,
+    "profit_cagr": 0,
+    "dividend_yield": 10,
+    "payout_ratio": 10,
+    "pbr": 0,
+    "equity_ratio": 5
+   }
+  },
+  {
+   "code": "4385",
+   "name": "メルカリ",
    "score": 20,
-   "price": 3470.0,
-   "per": 12.91210835752028,
-   "div_yield": 0.37463976945244953
+   "price": 3699.0,
+   "per": 17.2254819782062,
+   "div_yield": 0.0,
+   "points": {
+    "per": 0,
+    "drawdown": 10,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 0,
+    "dividend_yield": 0,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
   }
  ]
 }
