@@ -9,6 +9,7 @@ import html
 import json
 import math
 import os
+import re
 import sys
 import time
 
@@ -72,25 +73,34 @@ class JQuants:
         return self
 
     # ---------- 共通の取得処理（ページ送り・再試行つき） ----------
-    def get(self, path, params=None, retries=4):
+    def get(self, path, params=None, retries=6):
         params = dict(params or {})
         out = []
         while True:
+            last = ""
             for attempt in range(retries):
-                r = self.session.get(f"{BASE}{path}", params=params, timeout=90)
+                try:
+                    r = self.session.get(f"{BASE}{path}", params=params, timeout=90)
+                except requests.RequestException as e:
+                    last = f"通信エラー: {e}"
+                    time.sleep(2 ** attempt)
+                    continue
                 if r.status_code == 200:
                     break
+                last = f"{r.status_code} {r.text[:200]}"
                 if r.status_code in (429, 500, 502, 503, 504):
-                    time.sleep(2 ** attempt + 1)
+                    time.sleep(min(2 ** attempt * 2, 60))
                     continue
                 if r.status_code == 403:
                     raise JQuantsError(
                         f"{path} へのアクセスが拒否されました（403）。"
                         "ご契約のプランでこのデータが使えるか確認してください。"
                     )
-                raise JQuantsError(f"{path} の取得に失敗（{r.status_code}）: {r.text[:300]}")
+                raise JQuantsError(f"{path} の取得に失敗（{last}）")
             else:
-                raise JQuantsError(f"{path} の取得に失敗（再試行しても回復せず）")
+                raise JQuantsError(
+                    f"{path} の取得に失敗（{retries}回試してだめでした）。最後の応答: {last}"
+                )
 
             body = r.json()
             key = "data" if "data" in body else next(
@@ -102,6 +112,23 @@ class JQuants:
             if not pk:
                 return out
             params["pagination_key"] = pk
+
+    def covered_from(self):
+        """契約で遡れる最も古い日付を調べる（範囲外を要求して教えてもらう）。"""
+        try:
+            r = self.session.get(
+                f"{BASE}/markets/calendar",
+                params={"from": "2000-01-01", "to": "2000-01-31"},
+                timeout=30,
+            )
+            m = re.search(r"(\d{4}-\d{2}-\d{2})\s*~", r.text)
+            if m:
+                d = dt.date.fromisoformat(m.group(1)) + dt.timedelta(days=1)
+                print(f"[jq] 契約で遡れるのは {d.isoformat()} 以降です", flush=True)
+                return d
+        except Exception as e:
+            print(f"[jq] 遡及開始日の確認に失敗（無視して進めます）: {e}", flush=True)
+        return None
 
     # ---------- 個別のデータ ----------
     def master(self, date=None):
@@ -744,8 +771,21 @@ def _keep(df, cols):
     return df[[c for c in cols if c in df.columns]]
 
 
+_covered = []
+
+
+def covered_from(api):
+    """契約で遡れる最も古い日付（1度だけ調べて使い回す）。"""
+    if not _covered:
+        _covered.append(api.covered_from())
+    return _covered[0]
+
+
 def business_days(api, start, end):
-    """営業日の一覧を新しい順で返す。"""
+    """営業日の一覧を新しい順で返す。契約範囲の外は自動で切り詰める。"""
+    lim = covered_from(api)
+    if lim and start < lim:
+        start = lim
     try:
         cal = api.calendar(start.isoformat(), end.isoformat())
         days = [c["Date"] for c in cal if str(c.get("HolDiv")) in ("1", "2")]
@@ -780,7 +820,7 @@ def update_prices(api, today=None):
             frames.append(_keep(pd.DataFrame(rows), PRICE_COLS))
         if i % 20 == 0:
             _log(f"  {i}/{len(need)}日")
-        time.sleep(0.12)
+        time.sleep(0.2)
 
     if not frames:
         raise RuntimeError("株価が1日分も取得できませんでした")
@@ -823,21 +863,56 @@ def update_summary(api, today=None):
 
     if len(need) > 30:
         _log(f"決算データの初回取り込みです。{len(need)}日分（20〜30分かかります）")
+        time.sleep(10)   # 直前の連続アクセスから少し間を空ける
     elif need:
         _log(f"決算を取りに行きます: {len(need)}日分")
 
     frames = [old] if old is not None else []
+    done, fails = [], 0
+
+    def flush():
+        """途中経過を保存しておく（次回は続きから）。"""
+        if not done:
+            return
+        parts = list(frames)
+        parts.append(pd.DataFrame({"DiscDate": done, "Code": [None] * len(done)}))
+        df = pd.concat(parts, ignore_index=True)
+        df = df.drop_duplicates(
+            subset=[c for c in ["Code", "DiscDate", "CurPerType", "DocType"]
+                    if c in df.columns], keep="last")
+        _save(df, SUMMARY)
+
     for i, d in enumerate(need, 1):
-        rows = api.summary_by_date(d)
+        try:
+            rows = api.summary_by_date(d)
+            fails = 0
+        except Exception as e:
+            msg = str(e)
+            if "400" in msg:          # 契約範囲外などは取れないものとして記録
+                done.append(d)
+                continue
+            fails += 1
+            _log(f"  {d} の取得に失敗（{fails}回連続）: {msg[:160]}")
+            if fails >= 10:
+                flush()
+                raise RuntimeError(
+                    f"決算データの取得が {fails} 回連続で失敗したので中断しました。"
+                    f"ここまでの分は保存済みなので、もう一度実行すると続きから再開します。"
+                    f"最後のエラー: {msg[:200]}"
+                )
+            time.sleep(20)
+            continue
+
+        done.append(d)
         if rows:
             frames.append(_keep(pd.DataFrame(rows), SUM_COLS))
         if i % 100 == 0:
             _log(f"  {i}/{len(need)}日")
-        time.sleep(0.1)
+            flush()
+        time.sleep(0.2)
 
-    # 取りに行った日は「開示ゼロ」でも記録しておく（毎回取り直さないため）
     if need:
-        frames.append(pd.DataFrame({"DiscDate": need, "Code": [None] * len(need)}))
+        frames.append(pd.DataFrame({"DiscDate": done, "Code": [None] * len(done)}))
 
     if not frames:
         raise RuntimeError("決算データが取得できませんでした")
