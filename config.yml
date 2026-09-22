@@ -1,7 +1,6 @@
 # ===========================================================
 #  スクリーニング条件と配点の設定ファイル
 #  ここの数字を書き換えるだけで条件を調整できます。
-#  （プログラム本体を触る必要はありません）
 # ===========================================================
 
 universe:
@@ -10,68 +9,74 @@ universe:
   # 除外する業種コード。9999 = その他（REIT・ETFなどが入る）
   exclude_sector33: ["9999"]
 
-# -------------------- 必須条件 --------------------
+# -------------------- 必須条件（4つすべてを満たす） --------------------
 required:
   # 業績：直近の本決算が何期連続で増収増益か
-  # 5期分のデータで4回の比較ができるので、初期値は 4
-  # （データが貯まれば 5 に上げられます）
   consecutive_growth_years: 4
 
-  # PERの上限
-  per_max: 15.0
-  # PERがマイナス（赤字）や極端な値の銘柄は除外
-  per_min: 0.0
+  # PERの上限（会社予想の1株利益を使用）
+  per_max: 19.0
+  per_min: 0.0          # 赤字（PERがマイナス）は除外
 
-  # レンジ判定
+  # 流動性：直近20営業日の平均売買代金
+  min_avg_turnover_yen: 30000000
+
+  # 配当：ここ何年かで減配していないこと（ずっと0円でも通る）
+  no_dividend_cut: true
+  dividend_years: 5
+
+# -------------------- 株価の計算に使う期間（加点用） --------------------
+technical:
   high_lookback_days: 60      # 「直近3か月の高値」を見る営業日数
-  drawdown_min_pct: 10.0      # 高値から最低これだけ下げている（%）
   range_window_days: 20       # 横ばいを判定する直近の営業日数
-  range_width_max_pct: 12.0   # その期間の値幅が平均株価の何%以内なら「レンジ」か
+  range_width_max_pct: 12.0   # 値幅が平均株価の何%以内なら「レンジ」か
 
-  # 流動性フィルタ（板が薄すぎる銘柄を除く）
-  min_avg_turnover_yen: 30000000   # 直近20営業日の平均売買代金 3,000万円以上
-
-# -------------------- ポイント配点 --------------------
-# 上から順に条件を見て、最初に当てはまったものの点数が入ります
+# -------------------- ポイント配点（135点満点） --------------------
+# 上から順に見て、最初に当てはまったものの点数が入ります
 scoring:
-  dividend_yield:        # 配当利回り（%）
-    - {min: 3.0, points: 15, label: "配当利回り3%以上"}
-    - {min: 2.0, points: 10, label: "配当利回り2%以上"}
-    - {min: 1.0, points: 5,  label: "配当利回り1%以上"}
-
-  payout_ratio:          # 配当性向（%）
-    - {min: 20.0, max: 50.0, points: 10, label: "配当性向20〜50%"}
-    - {min: 0.0,  max: 20.0, points: 5,  label: "配当性向20%未満"}
-
   per:                   # PER（倍）
-    - {max: 10.0, points: 10, label: "PER10倍以下"}
-    - {max: 12.0, points: 5,  label: "PER12倍以下"}
-
-  pbr:                   # PBR（倍）
-    - {max: 1.0, points: 10, label: "PBR1倍割れ"}
-    - {max: 1.5, points: 5,  label: "PBR1.5倍以下"}
+    - {min: 0.01, max: 10.0, points: 30, label: "PER10倍以下"}
+    - {min: 0.01, max: 12.0, points: 20, label: "PER12倍以下"}
+    - {min: 0.01, max: 14.0, points: 15, label: "PER14倍以下"}
+    - {min: 0.01, max: 16.0, points: 10, label: "PER16倍以下"}
 
   drawdown:              # 3か月高値からの下落率（%）
-    - {min: 30.0, points: 5,  label: "高値から30%超下落"}
-    - {min: 20.0, points: 10, label: "高値から20〜30%下落"}
-    - {min: 10.0, points: 5,  label: "高値から10〜20%下落"}
+    - {min: 30.0, points: 15, label: "高値から30%以上下落"}
+    - {min: 20.0, points: 10, label: "高値から20%以上下落"}
+    - {min: 10.0, points: 5,  label: "高値から10%以上下落"}
 
   range_days:            # レンジに入ってからの営業日数
+    - {min: 60, points: 15, label: "レンジ入り60日以上"}
     - {min: 40, points: 10, label: "レンジ入り40日以上"}
     - {min: 20, points: 5,  label: "レンジ入り20日以上"}
+
+  operating_margin:      # 営業利益率（%）
+    - {min: 25.0, points: 15, label: "営業利益率25%以上"}
+    - {min: 15.0, points: 10, label: "営業利益率15%以上"}
+    - {min: 8.0,  points: 5,  label: "営業利益率8%以上"}
+
+  profit_cagr:           # 営業利益の年平均成長率（%）
+    - {min: 20.0, points: 15, label: "営業利益 年20%成長"}
+    - {min: 10.0, points: 10, label: "営業利益 年10%成長"}
+    - {min: 5.0,  points: 5,  label: "営業利益 年5%成長"}
+
+  dividend_yield:        # 配当利回り（%）
+    - {min: 4.0, points: 15, label: "配当利回り4%以上"}
+    - {min: 2.0, points: 10, label: "配当利回り2%以上"}
+    - {min: 0.5, points: 5,  label: "配当利回り0.5%以上"}
+
+  payout_ratio:          # 配当性向（%）
+    - {min: 20.0, max: 40.0, points: 10, label: "配当性向20〜40%"}
+    - {min: 10.0, max: 20.0, points: 5,  label: "配当性向10〜20%"}
+
+  pbr:                   # PBR（倍）。0以下（債務超過）は加点しない
+    - {min: 0.01, max: 1.0, points: 10, label: "PBR1倍割れ"}
+    - {min: 0.01, max: 1.5, points: 5,  label: "PBR1.5倍以下"}
 
   equity_ratio:          # 自己資本比率（%）
     - {min: 60.0, points: 10, label: "自己資本比率60%以上"}
     - {min: 40.0, points: 5,  label: "自己資本比率40%以上"}
 
-  operating_margin:      # 営業利益率（%）
-    - {min: 15.0, points: 10, label: "営業利益率15%以上"}
-    - {min: 8.0,  points: 5,  label: "営業利益率8%以上"}
-
-  profit_cagr:           # 営業利益の年平均成長率（%）
-    - {min: 20.0, points: 10, label: "営業利益 年20%成長"}
-    - {min: 10.0, points: 5,  label: "営業利益 年10%成長"}
-
 # -------------------- 表示 --------------------
 display:
-  max_rows: 80           # ページに載せる最大銘柄数（点数の高い順）
+  max_rows: 150          # ページに載せる最大銘柄数（合計点の高い順）
