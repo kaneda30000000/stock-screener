@@ -212,11 +212,12 @@ def _code4(s):
 
 
 # ============================================================ 決算・指標
-def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame) -> pd.DataFrame:
+def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame,
+                       dividend_years: int = 5) -> pd.DataFrame:
     """銘柄ごとに「業績の並び」と「1株あたり指標」をまとめる。"""
     df = summary[summary["Code"].notna()].copy()
     for col in ("DocType", "CurPerType", "CurFYEn", "Sales", "OP", "EqAR",
-                "FDivAnn", "DivAnn", "DiscDate"):
+                "FDivAnn", "DivAnn", "DiscDate", "NP"):
         if col not in df.columns:
             df[col] = None
     df["DiscDate"] = df["DiscDate"].astype(str)
@@ -228,6 +229,7 @@ def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame) -> pd.DataFrame
     ).str.startswith(FY_DOC_PREFIX)
     fy = df[is_fy].copy()
     fy["Sales"], fy["OP"] = _num(fy["Sales"]), _num(fy["OP"])
+    fy["DivAnn"] = _num(fy["DivAnn"])
     fy["CurFYEn"] = fy["CurFYEn"].astype(str)
     fy = fy[fy["CurFYEn"].str.len() >= 7]
     fy = fy.sort_values(["code", "CurFYEn", "DiscDate"])
@@ -256,6 +258,15 @@ def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame) -> pd.DataFrame
         if n >= 2 and op[0] > 0 and op[-1] > 0:
             cagr = ((op[-1] / op[0]) ** (1 / (n - 1)) - 1) * 100
 
+        # 配当の並び（直近 dividend_years 期分）を見て、減配があったか
+        divs = g["DivAnn"].to_numpy(dtype=float)
+        divs = divs[~np.isnan(divs)][-dividend_years:]
+        cut = False
+        for i in range(1, len(divs)):
+            if divs[i] < divs[i - 1] - 1e-9:
+                cut = True
+                break
+
         rows.append({
             "code": code,
             "fy_count": n,
@@ -263,6 +274,9 @@ def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame) -> pd.DataFrame
             "latest_fy": years[-1],
             "op_margin": (op[-1] / sales[-1] * 100) if sales[-1] else np.nan,
             "profit_cagr": cagr,
+            "div_years": len(divs),
+            "div_cut": cut,
+            "div_series": [float(x) for x in divs],
         })
 
     if not rows:
@@ -366,6 +380,21 @@ def build_technicals(prices: pd.DataFrame, req: dict) -> pd.DataFrame:
 
 
 # ============================================================ 採点
+# (設定キー, 計算列, 表示名, 単位, 小数桁, 大きいほど良いか)
+METRIC_INFO = [
+    ("per",              "per",          "PER",        "倍", 1, False),
+    ("drawdown",         "drawdown",     "下落率",     "%",  1, True),
+    ("range_days",       "range_days",   "レンジ日数", "日", 0, True),
+    ("operating_margin", "op_margin",    "営業利益率", "%",  1, True),
+    ("profit_cagr",      "profit_cagr",  "利益成長",   "%",  1, True),
+    ("dividend_yield",   "div_yield",    "配当利回り", "%",  2, True),
+    ("payout_ratio",     "payout",       "配当性向",   "%",  0, True),
+    ("pbr",              "pbr",          "PBR",        "倍", 2, False),
+    ("equity_ratio",     "equity_ratio", "自己資本比率", "%", 0, True),
+]
+METRICS = [(k, c) for k, c, *_ in METRIC_INFO]
+
+
 def _tier(value, rules):
     if value is None or (isinstance(value, float) and np.isnan(value)):
         return 0, None
@@ -400,28 +429,21 @@ def screen(fund, tech, info, cfg, price_override=None):
 
     c_growth = df["growth_streak"] >= int(req["consecutive_growth_years"])
     c_per = df["per"].between(float(req["per_min"]) + 1e-9, float(req["per_max"]))
-    c_dd = df["drawdown"] >= float(req["drawdown_min_pct"])
-    c_range = (df["range_width"] <= float(req["range_width_max_pct"])) & df["not_recovered"]
     c_liq = df["avg_turnover"] >= float(req["min_avg_turnover_yen"])
+    c_div = (~df["div_cut"].fillna(False)) if req.get("no_dividend_cut", True) \
+        else pd.Series(True, index=df.index)
 
     df["ok_growth"], df["ok_per"] = c_growth, c_per
-    df["ok_drawdown"], df["ok_range"], df["ok_liquidity"] = c_dd, c_range, c_liq
-    passed = df[c_growth & c_per & c_dd & c_range & c_liq].copy()
+    df["ok_liquidity"], df["ok_dividend"] = c_liq, c_div
+    passed = df[c_growth & c_per & c_liq & c_div].copy()
 
-    metric_map = [
-        ("dividend_yield", "div_yield"), ("payout_ratio", "payout"),
-        ("per", "per"), ("pbr", "pbr"), ("drawdown", "drawdown"),
-        ("range_days", "range_days"), ("equity_ratio", "equity_ratio"),
-        ("operating_margin", "op_margin"), ("profit_cagr", "profit_cagr"),
-    ]
     scores, details = [], []
     for _, row in passed.iterrows():
-        total, det = 0, []
-        for key, col in metric_map:
+        total, det = 0, {}
+        for key, col in METRICS:
             pts, label = _tier(row.get(col), sc.get(key, []))
-            if pts:
-                total += pts
-                det.append({"label": label, "points": pts})
+            det[key] = {"points": pts, "label": label}
+            total += pts
         scores.append(total)
         details.append(det)
     passed["score"] = scores
@@ -429,7 +451,7 @@ def screen(fund, tech, info, cfg, price_override=None):
     passed["score_max"] = sum(
         max((r["points"] for r in rules), default=0) for rules in sc.values()
     )
-    passed = passed.sort_values(["score", "div_yield"], ascending=[False, False])
+    passed = passed.sort_values(["score", "per"], ascending=[False, True])
     return passed, df
 
 
@@ -437,228 +459,221 @@ def screen(fund, tech, info, cfg, price_override=None):
 # HTMLページの生成
 # ====================================================================
 def _f(v, digits=1, suffix="", dash="—"):
-    if v is None:
-        return dash
     try:
-        if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+        if v is None or (isinstance(v, float) and (math.isnan(v) or math.isinf(v))):
             return dash
         return f"{float(v):,.{digits}f}{suffix}"
     except (TypeError, ValueError):
         return dash
 
 
-def _sparkline(values, w=132, h=34):
+def _sortval(v, higher_is_better):
+    """並べ替え用の数値。欠損は必ず最後に来るようにする。"""
+    try:
+        f = float(v)
+        if math.isnan(f) or math.isinf(f):
+            raise ValueError
+    except (TypeError, ValueError):
+        return -1e18
+    return f if higher_is_better else -f
+
+
+def _sparkline(values, w=96, h=26):
     vals = [v for v in (values or []) if v is not None and not math.isnan(v)]
     if len(vals) < 3:
         return ""
     lo, hi = min(vals), max(vals)
     rng = (hi - lo) or 1
     step = (w - 4) / (len(vals) - 1)
-    pts = " ".join(
-        f"{2 + i * step:.1f},{h - 3 - (v - lo) / rng * (h - 6):.1f}"
-        for i, v in enumerate(vals)
-    )
-    last_x = 2 + (len(vals) - 1) * step
-    last_y = h - 3 - (vals[-1] - lo) / rng * (h - 6)
-    return (
-        f'<svg class="spark" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
-        f'aria-hidden="true"><polyline points="{pts}" fill="none" '
-        f'stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" '
-        f'stroke-linecap="round"/>'
-        f'<circle cx="{last_x:.1f}" cy="{last_y:.1f}" r="2.6" fill="currentColor"/></svg>'
-    )
+    pts = " ".join(f"{2 + i * step:.1f},{h - 3 - (v - lo) / rng * (h - 6):.1f}"
+                   for i, v in enumerate(vals))
+    return (f'<svg class="spark" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
+            f'aria-hidden="true"><polyline points="{pts}" fill="none" '
+            f'stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>')
 
 
-def _card(row, rank):
-    code = html.escape(str(row.name))
-    name = html.escape(str(row.get("name") or ""))
-    sector = html.escape(str(row.get("sector") or ""))
-    score = int(row.get("score") or 0)
-    smax = int(row.get("score_max") or 100)
-    pct = max(4, min(100, round(score / smax * 100)))
+def _row(r, rank, smax):
+    code = html.escape(str(r.name))
+    name = html.escape(str(r.get("name") or ""))
+    sector = html.escape(str(r.get("sector") or ""))
+    score = int(r.get("score") or 0)
+    det = r.get("score_detail") or {}
 
-    chips = "".join(
-        f'<span class="chip">{html.escape(str(d["label"]))}'
-        f'<b>+{int(d["points"])}</b></span>'
-        for d in (row.get("score_detail") or []) if d.get("label")
-    )
+    cells, attrs = [], [
+        f'data-s-score="{score}"', f'data-v-score="{score}"',
+    ]
+    for key, col, _label, unit, digits, hib in METRIC_INFO:
+        pts = int((det.get(key) or {}).get("points") or 0)
+        val = r.get(col)
+        attrs.append(f'data-s-{key}="{pts}"')
+        attrs.append(f'data-v-{key}="{_sortval(val, hib):.6f}"')
+        cls = " has" if pts else ""
+        cells.append(
+            f'<td class="m{cls}"><span class="val">{_f(val, digits, unit)}</span>'
+            f'<span class="pt">{"+" + str(pts) if pts else "・"}</span></td>'
+        )
 
-    def cell(label, value):
-        return f'<div class="cell"><span>{label}</span><b>{value}</b></div>'
+    pct = max(3, min(100, round(score / smax * 100))) if smax else 0
+    streak = int(r.get("growth_streak") or 0)
+    dy = int(r.get("div_years") or 0)
 
-    metrics = "".join([
-        cell("株価", _f(row.get("price"), 0, "円")),
-        cell("PER", _f(row.get("per"), 1, "倍")),
-        cell("PBR", _f(row.get("pbr"), 2, "倍")),
-        cell("配当利回り", _f(row.get("div_yield"), 2, "%")),
-        cell("配当性向", _f(row.get("payout"), 0, "%")),
-        cell("自己資本比率", _f(row.get("equity_ratio"), 0, "%")),
-        cell("営業利益率", _f(row.get("op_margin"), 1, "%")),
-        cell("高値から", "−" + _f(row.get("drawdown"), 1, "%")),
-        cell("レンジ日数", _f(row.get("range_days"), 0, "日")),
-    ])
-
-    streak = int(row.get("growth_streak") or 0)
-    cagr = _f(row.get("profit_cagr"), 1, "%")
-    lo, hi = _f(row.get("range_low"), 0), _f(row.get("range_high"), 0)
-
-    return f"""
-<article class="card">
-  <header>
-    <div class="ident">
-      <span class="rank">{rank}</span>
-      <div>
-        <h2><span class="code">{code}</span> {name}</h2>
-        <p class="sector">{sector}</p>
-      </div>
-    </div>
-    <div class="score">
-      <div class="score-num">{score}<span>/{smax}</span></div>
-      <div class="bar"><i style="width:{pct}%"></i></div>
-    </div>
-  </header>
-  <div class="grid">{metrics}</div>
-  <div class="foot">
-    <div class="note">{streak}期連続 増収増益 ・ 営業利益 年{cagr}成長<br>
-      レンジ {lo}〜{hi}円</div>
-    <div class="sparkwrap">{_sparkline(row.get("spark"))}<span>直近3か月</span></div>
-  </div>
-  <div class="chips">{chips}</div>
-</article>"""
+    return f"""<tr {' '.join(attrs)}>
+<th class="name" scope="row"><span class="rank">{rank}</span>
+  <span class="ident"><b>{name}</b><small>{code} ・ {sector}</small></span></th>
+<td class="total"><b>{score}</b><span class="track"><i style="width:{pct}%"></i></span></td>
+{''.join(cells)}
+<td class="px">{_f(r.get("price"), 0, "円")}</td>
+<td class="note">{streak}期連続<br>増収増益<br>配当{dy}期</td>
+<td class="sp">{_sparkline(r.get("spark"))}</td>
+</tr>"""
 
 
 CSS = """
 :root{
-  --bg:#f6f7f9; --surface:#ffffff; --line:#e3e6ea;
-  --ink:#16191d; --ink2:#5a616b; --ink3:#878e99;
+  --bg:#f6f7f9; --surface:#fff; --line:#e3e6ea; --line2:#eef0f3;
+  --ink:#16191d; --ink2:#5a616b; --ink3:#8a919c;
   --accent:#1f6feb; --accent-soft:#e8f0fe;
-  --good:#1a7f5a; --warn:#b06b00;
-  --radius:14px;
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#0f1216; --surface:#171b21; --line:#282e37;
-    --ink:#e9edf2; --ink2:#a3acb9; --ink3:#767f8c;
-    --accent:#5a9bff; --accent-soft:#1b2940;
-    --good:#4ec08d; --warn:#e0a23c;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0f1216; --surface:#171b21; --line:#282e37;
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1216; --surface:#171b21; --line:#282e37; --line2:#1f242b;
   --ink:#e9edf2; --ink2:#a3acb9; --ink3:#767f8c;
   --accent:#5a9bff; --accent-soft:#1b2940;
-  --good:#4ec08d; --warn:#e0a23c;
-}
+}}
 *{box-sizing:border-box}
-body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",
-    "Yu Gothic UI",sans-serif;
-  font-size:15px; line-height:1.55;
-  -webkit-text-size-adjust:100%;
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;
+  font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:1400px;margin:0 auto;padding:18px 14px 56px}
+h1{font-size:18px;margin:0 0 3px}
+.sub{color:var(--ink2);font-size:12px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:13px 0 10px;max-width:520px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+.stat span{display:block;font-size:10.5px;color:var(--ink3);white-space:nowrap}
+.stat b{font-size:17px;font-variant-numeric:tabular-nums}
+.hint{font-size:11.5px;color:var(--ink3);margin:0 0 8px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+th,td{white-space:nowrap;padding:7px 9px;border-bottom:1px solid var(--line2);text-align:right}
+thead th{position:sticky;top:0;z-index:3;background:var(--surface);
+  font-size:11px;font-weight:600;color:var(--ink2);border-bottom:1px solid var(--line);
+  text-align:right;line-height:1.3}
+thead th.s{cursor:pointer;user-select:none}
+thead th.s:hover{color:var(--accent)}
+thead th.s::after{content:"⌄";opacity:.35;margin-left:3px;font-size:10px}
+thead th.s.on{color:var(--accent)}
+thead th.s.on::after{opacity:1}
+th.name,thead th.name{position:sticky;left:0;z-index:4;background:var(--surface);
+  text-align:left;min-width:196px;max-width:196px;white-space:normal;
+  border-right:1px solid var(--line)}
+tbody th.name{z-index:2;font-weight:400;display:flex;gap:7px;align-items:flex-start}
+.rank{flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:6px;
+  background:var(--accent-soft);color:var(--accent);font-size:10.5px;font-weight:700;
+  margin-top:2px}
+.ident{min-width:0}
+.ident b{display:block;font-size:13px;font-weight:600;line-height:1.3}
+.ident small{display:block;font-size:10.5px;color:var(--ink3)}
+td.total{min-width:80px}
+td.total b{font-size:16px;font-weight:700}
+td.total .track{display:block;height:3px;border-radius:2px;background:var(--line);margin-top:4px}
+td.total i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+@media(max-width:560px){
+  th.name,thead th.name{min-width:150px;max-width:150px}
+  .ident b{font-size:12px}
+  th,td{padding:6px 7px}
+  td.m{min-width:64px}
 }
-.wrap{max-width:1180px; margin:0 auto; padding:20px 16px 64px}
-.top{margin-bottom:18px}
-.top h1{font-size:19px; margin:0 0 4px; letter-spacing:.01em}
-.top .sub{color:var(--ink2); font-size:13px; margin:0}
-.stats{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:14px 0 6px;
-  max-width:520px;
-}
-.stat{
-  background:var(--surface); border:1px solid var(--line); border-radius:10px;
-  padding:8px 10px;
-}
-.stat span{display:block; font-size:10.5px; color:var(--ink3); white-space:nowrap}
-.stat b{font-size:17px; font-variant-numeric:tabular-nums}
-.cards{display:grid; gap:12px; grid-template-columns:1fr}
-@media(min-width:760px){.cards{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1140px){.cards{grid-template-columns:repeat(3,1fr)}}
-.card{
-  background:var(--surface); border:1px solid var(--line);
-  border-radius:var(--radius); padding:14px 14px 12px;
-}
-.card header{display:flex; justify-content:space-between; gap:12px; align-items:flex-start}
-.ident{display:flex; gap:9px; min-width:0}
-.rank{
-  flex:none; width:22px; height:22px; border-radius:6px; margin-top:2px;
-  background:var(--accent-soft); color:var(--accent);
-  font-size:11px; font-weight:700; display:grid; place-items:center;
-  font-variant-numeric:tabular-nums;
-}
-.card h2{font-size:14.5px; margin:0; font-weight:650; line-height:1.35}
-.code{
-  font-variant-numeric:tabular-nums; color:var(--ink2);
-  font-size:12.5px; margin-right:4px;
-}
-.sector{margin:1px 0 0; font-size:11.5px; color:var(--ink3)}
-.score{flex:none; width:92px; text-align:right}
-.score-num{font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1}
-.score-num span{font-size:11px; color:var(--ink3); font-weight:500}
-.bar{height:5px; border-radius:3px; background:var(--line); margin-top:5px; overflow:hidden}
-.bar i{display:block; height:100%; border-radius:3px; background:var(--accent)}
-.grid{
-  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
-  background:var(--line); border:1px solid var(--line); border-radius:10px;
-  overflow:hidden; margin:12px 0 10px;
-}
-.cell{background:var(--surface); padding:6px 8px}
-.cell span{display:block; font-size:10.5px; color:var(--ink3)}
-.cell b{font-size:13.5px; font-weight:600; font-variant-numeric:tabular-nums}
-.foot{display:flex; justify-content:space-between; align-items:flex-end; gap:10px}
-.note{font-size:11.5px; color:var(--ink2)}
-.sparkwrap{flex:none; text-align:right; color:var(--accent)}
-.sparkwrap span{display:block; font-size:10px; color:var(--ink3); margin-top:-2px}
-.chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:10px}
-.chip{
-  font-size:10.5px; color:var(--ink2); background:var(--bg);
-  border:1px solid var(--line); border-radius:999px; padding:2px 8px;
-}
-.chip b{color:var(--accent); margin-left:4px; font-variant-numeric:tabular-nums}
-.empty{
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-  padding:28px 18px; text-align:center; color:var(--ink2);
-}
-details.about{margin-top:26px; font-size:12.5px; color:var(--ink2)}
-details.about summary{cursor:pointer; color:var(--ink); font-weight:600}
-details.about table{border-collapse:collapse; margin-top:10px; width:100%}
-details.about th,details.about td{
-  border-bottom:1px solid var(--line); padding:5px 8px; text-align:left; font-weight:400;
-}
-details.about th{color:var(--ink3); font-size:11px}
-footer{margin-top:26px; font-size:11px; color:var(--ink3); line-height:1.7}
+td.m{min-width:72px}
+td.m .val{display:block;font-size:13px}
+td.m .pt{display:block;font-size:10.5px;color:var(--ink3)}
+td.m.has .pt{color:var(--accent);font-weight:700}
+td.px{color:var(--ink2)}
+td.note{font-size:10px;color:var(--ink3);line-height:1.35;text-align:left}
+td.sp{color:var(--accent);padding-right:12px}
+tbody tr:hover th.name,tbody tr:hover td{background:var(--line2)}
+.empty{padding:30px 16px;text-align:center;color:var(--ink2)}
+details.about{margin-top:22px;font-size:12.5px;color:var(--ink2)}
+details.about summary{cursor:pointer;color:var(--ink);font-weight:600}
+details.about table{margin-top:10px;width:auto;max-width:820px}
+details.about th,details.about td{border-bottom:1px solid var(--line);padding:5px 10px;
+  text-align:left;font-weight:400;white-space:normal}
+details.about th{color:var(--ink3);font-size:11px}
+footer{margin-top:22px;font-size:11px;color:var(--ink3);line-height:1.7}
+"""
+
+JS = """
+(function(){
+  var tb=document.querySelector('tbody'); if(!tb) return;
+  var heads=document.querySelectorAll('thead th.s');
+  function sort(key,th){
+    var rows=Array.prototype.slice.call(tb.querySelectorAll('tr'));
+    rows.sort(function(a,b){
+      var pa=+a.getAttribute('data-s-'+key), pb=+b.getAttribute('data-s-'+key);
+      if(pb!==pa) return pb-pa;
+      var va=+a.getAttribute('data-v-'+key), vb=+b.getAttribute('data-v-'+key);
+      return vb-va;
+    });
+    rows.forEach(function(r,i){
+      tb.appendChild(r);
+      var k=r.querySelector('.rank'); if(k) k.textContent=i+1;
+    });
+    heads.forEach(function(h){h.classList.toggle('on',h===th);});
+    try{localStorage.setItem('sortKey',key);}catch(e){}
+  }
+  heads.forEach(function(th){
+    th.addEventListener('click',function(){sort(th.dataset.key,th);});
+  });
+  var saved=null; try{saved=localStorage.getItem('sortKey');}catch(e){}
+  if(saved){
+    for(var i=0;i<heads.length;i++){
+      if(heads[i].dataset.key===saved){sort(saved,heads[i]);break;}
+    }
+  }
+})();
 """
 
 
 def render_page(passed, allrows, cfg, meta, out_path):
     rows = passed.head(int(cfg["display"]["max_rows"]))
-    cards = "\n".join(_card(r, i + 1) for i, (_, r) in enumerate(rows.iterrows()))
-    if not len(rows):
-        cards = ('<div class="empty">今日は必須条件をすべて満たす銘柄がありませんでした。'
-                 '<br>条件をゆるめたい場合は config.yml の数字を調整してください。</div>')
+    smax = int(passed["score_max"].max()) if len(passed) else 0
 
-    fails = [
-        ("業績（連続増収増益）", int(allrows["ok_growth"].sum())),
-        ("PER15倍以下", int(allrows["ok_per"].sum())),
-        ("高値から下落", int(allrows["ok_drawdown"].sum())),
-        ("レンジ形成", int(allrows["ok_range"].sum())),
-        ("売買代金", int(allrows["ok_liquidity"].sum())),
-    ]
-    fail_rows = "".join(
-        f"<tr><td>{html.escape(k)}</td><td>{v:,} 銘柄</td></tr>" for k, v in fails
-    )
+    heads = ['<th class="name" scope="col">銘柄</th>',
+             '<th class="s on" data-key="score" scope="col">合計<br>/' + str(smax) + '</th>']
+    for key, _col, label, _u, _d, _h in METRIC_INFO:
+        heads.append(f'<th class="s" data-key="{key}" scope="col">{label}</th>')
+    heads += ['<th scope="col">株価</th>', '<th scope="col">業績</th>',
+              '<th scope="col">3か月</th>']
+
+    body = "\n".join(_row(r, i + 1, smax) for i, (_, r) in enumerate(rows.iterrows()))
+    if not len(rows):
+        table = ('<div class="empty">今日は必須条件をすべて満たす銘柄がありませんでした。'
+                 '<br>条件をゆるめたい場合は config.yml の数字を調整してください。</div>')
+    else:
+        table = ('<div class="scroll"><table><thead><tr>' + "".join(heads)
+                 + '</tr></thead><tbody>' + body + '</tbody></table></div>')
 
     req = cfg["required"]
+    tech = cfg.get("technical", {})
     cond_rows = "".join([
-        f"<tr><td>業績</td><td>直近{req['consecutive_growth_years']}期連続で増収かつ増益</td></tr>",
-        f"<tr><td>PER</td><td>{req['per_max']}倍以下（会社予想EPS基準）</td></tr>",
-        f"<tr><td>下落</td><td>直近{req['high_lookback_days']}営業日の高値から{req['drawdown_min_pct']}%以上下落</td></tr>",
-        f"<tr><td>レンジ</td><td>直近{req['range_window_days']}営業日の値幅が平均株価の{req['range_width_max_pct']}%以内、かつ高値を更新していない</td></tr>",
-        f"<tr><td>流動性</td><td>平均売買代金 {int(req['min_avg_turnover_yen']):,}円以上</td></tr>",
-    ])
+        f"<tr><td>業績</td><td>直近{req['consecutive_growth_years']}期連続で増収かつ増益</td>"
+        f"<td>{int(allrows['ok_growth'].sum()):,}</td></tr>",
+        f"<tr><td>PER</td><td>{req['per_max']}倍以下（会社予想の1株利益）</td>"
+        f"<td>{int(allrows['ok_per'].sum()):,}</td></tr>",
+        f"<tr><td>流動性</td><td>平均売買代金 {int(req['min_avg_turnover_yen']):,}円以上</td>"
+        f"<td>{int(allrows['ok_liquidity'].sum()):,}</td></tr>",
+        f"<tr><td>配当</td><td>直近{req.get('dividend_years', 5)}期で減配なし（無配continuedも可）</td>"
+        f"<td>{int(allrows['ok_dividend'].sum()):,}</td></tr>",
+    ]).replace("無配continued", "ずっと無配")
+
+    sc_rows = ""
+    for key, _col, label, _u, _d, _h in METRIC_INFO:
+        tiers = " ／ ".join(
+            f"{html.escape(str(t.get('label', '')))} <b>+{int(t['points'])}</b>"
+            for t in cfg["scoring"].get(key, []))
+        sc_rows += f"<tr><td>{label}</td><td>{tiers or '—'}</td></tr>"
 
     now = dt.datetime.now(JST).strftime("%Y-%m-%d %H:%M")
-    return_html = f"""<!DOCTYPE html>
+    doc = f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
@@ -669,49 +684,48 @@ def render_page(passed, allrows, cfg, meta, out_path):
 </head>
 <body>
 <div class="wrap">
-  <div class="top">
-    <h1>買い時スクリーニング</h1>
-    <p class="sub">最終更新 {now}（日本時間）・株価基準 {html.escape(str(meta.get('price_date','—')))}{html.escape(meta.get('price_note',''))}</p>
-    <div class="stats">
-      <div class="stat"><span>調べた銘柄</span><b>{meta.get('universe',0):,}</b></div>
-      <div class="stat"><span>条件通過</span><b>{len(passed):,}</b></div>
-      <div class="stat"><span>表示</span><b>{len(rows):,}</b></div>
-      <div class="stat"><span>最高点</span><b>{int(passed['score'].max()) if len(passed) else 0}</b></div>
-    </div>
+  <h1>買い時スクリーニング</h1>
+  <p class="sub">最終更新 {now}（日本時間）・株価基準 {html.escape(str(meta.get('price_date','—')))}{html.escape(meta.get('price_note',''))}</p>
+  <div class="stats">
+    <div class="stat"><span>調べた銘柄</span><b>{meta.get('universe',0):,}</b></div>
+    <div class="stat"><span>条件通過</span><b>{len(passed):,}</b></div>
+    <div class="stat"><span>表示</span><b>{len(rows):,}</b></div>
+    <div class="stat"><span>最高点</span><b>{int(passed['score'].max()) if len(passed) else 0}</b></div>
   </div>
+  <p class="hint">項目名をタップすると、その項目の点数が高い順に並べ替わります（同点のときは中身の良いほうが上）。横にスクロールできます。</p>
 
-  <div class="cards">
-{cards}
-  </div>
+{table}
 
   <details class="about">
     <summary>条件と配点について</summary>
     <table>
-      <tr><th>必須条件</th><th>内容</th></tr>
+      <tr><th>必須条件</th><th>内容</th><th>単独で満たした数</th></tr>
       {cond_rows}
     </table>
     <table>
-      <tr><th>各条件を単独で満たした銘柄数</th><th></th></tr>
-      {fail_rows}
+      <tr><th>加点項目（合計{smax}点満点）</th><th>段階</th></tr>
+      {sc_rows}
     </table>
   </details>
 
   <footer>
-    このページは自動生成です。数値はJPX公式のJ-Quants APIと、日中は遅延株価をもとに機械的に計算しています。<br>
+    このページは自動生成です。数値はJPX公式のJ-Quants APIをもとに機械的に計算しています。<br>
+    株式分割があった銘柄は、1株あたり配当が見かけ上減って「減配」と判定されることがあります。<br>
     決算の実数値・会社予想は必ずご自身で確認してください。投資判断の責任は利用者にあります。
   </footer>
 </div>
+<script>{JS}</script>
 </body>
 </html>"""
-
     with open(out_path, "w", encoding="utf-8") as f:
-        f.write(return_html)
+        f.write(doc)
     return out_path
 
 
 def dump_json(passed, meta, path):
     recs = []
     for code, r in passed.iterrows():
+        det = r.get("score_detail") or {}
         recs.append({
             "code": str(code),
             "name": r.get("name"),
@@ -719,6 +733,7 @@ def dump_json(passed, meta, path):
             "price": None if r.get("price") is None or np.isnan(r.get("price")) else float(r["price"]),
             "per": None if np.isnan(r.get("per", np.nan)) else float(r["per"]),
             "div_yield": None if np.isnan(r.get("div_yield", np.nan)) else float(r["div_yield"]),
+            "points": {k: int(v.get("points") or 0) for k, v in det.items()},
         })
     with open(path, "w", encoding="utf-8") as f:
         json.dump({"meta": meta, "stocks": recs}, f, ensure_ascii=False, indent=1)
@@ -983,8 +998,9 @@ def run(mode):
     print(f"[run] 対象銘柄: {len(info):,}")
     prices = prices[prices["Code"].astype(str).str[:4].isin(info.index)]
 
-    fund = build_fundamentals(summary, val)
-    tech = build_technicals(prices, cfg["required"])
+    fund = build_fundamentals(
+        summary, val, int(cfg["required"].get("dividend_years", 5)))
+    tech = build_technicals(prices, cfg["technical"])
     print(f"[run] 決算あり {len(fund):,} / 株価あり {len(tech):,}")
 
     override, note = None, ""
@@ -996,9 +1012,9 @@ def run(mode):
             (pre["growth_streak"] >= req["consecutive_growth_years"])
             & (pre["per_pre"] > 0)
             & (pre["per_pre"] <= req["per_max"] * 1.25)
-            & (pre["drawdown"] >= req["drawdown_min_pct"] - 6)
             & (pre["avg_turnover"] >= req["min_avg_turnover_yen"])
-        ].sort_values("avg_turnover", ascending=False).head(500)
+            & (~pre["div_cut"].fillna(False))
+        ].sort_values("avg_turnover", ascending=False).head(600)
         print(f"[run] 日中に株価を取り直す銘柄: {len(watch):,}")
         override = fetch_latest(list(watch.index))
         note = (f" ＋ {dt.datetime.now(JST).strftime('%H:%M')}時点の遅延株価で更新"
