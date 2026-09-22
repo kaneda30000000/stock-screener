@@ -1,15 +1,742 @@
 <!DOCTYPE html>
-<html lang="ja"><head><meta charset="utf-8">
+<html lang="ja">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
 <title>買い時スクリーニング</title>
 <style>
-body{margin:0;background:#f6f7f9;color:#16191d;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.7}
-@media(prefers-color-scheme:dark){body{background:#0f1216;color:#e9edf2}.box{background:#171b21!important;border-color:#282e37!important}}
-.wrap{max-width:560px;margin:0 auto;padding:60px 16px}
-.box{background:#fff;border:1px solid #e3e6ea;border-radius:14px;padding:24px}
-h1{font-size:18px;margin:0 0 10px}p{font-size:14px;margin:0 0 8px}
-</style></head><body><div class="wrap"><div class="box">
-<h1>買い時スクリーニング</h1>
-<p>まだ一度も実行されていません。</p>
-<p>GitHubの <b>Actions</b> タブから「スクリーニング」を手動で1回実行すると、ここに結果が表示されます。</p>
-</div></div></body></html>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --line:#e3e6ea;
+  --ink:#16191d; --ink2:#5a616b; --ink3:#878e99;
+  --accent:#1f6feb; --accent-soft:#e8f0fe;
+  --good:#1a7f5a; --warn:#b06b00;
+  --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1216; --surface:#171b21; --line:#282e37;
+    --ink:#e9edf2; --ink2:#a3acb9; --ink3:#767f8c;
+    --accent:#5a9bff; --accent-soft:#1b2940;
+    --good:#4ec08d; --warn:#e0a23c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1216; --surface:#171b21; --line:#282e37;
+  --ink:#e9edf2; --ink2:#a3acb9; --ink3:#767f8c;
+  --accent:#5a9bff; --accent-soft:#1b2940;
+  --good:#4ec08d; --warn:#e0a23c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",
+    "Yu Gothic UI",sans-serif;
+  font-size:15px; line-height:1.55;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:20px 16px 64px}
+.top{margin-bottom:18px}
+.top h1{font-size:19px; margin:0 0 4px; letter-spacing:.01em}
+.top .sub{color:var(--ink2); font-size:13px; margin:0}
+.stats{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:14px 0 6px;
+  max-width:520px;
+}
+.stat{
+  background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  padding:8px 10px;
+}
+.stat span{display:block; font-size:10.5px; color:var(--ink3); white-space:nowrap}
+.stat b{font-size:17px; font-variant-numeric:tabular-nums}
+.cards{display:grid; gap:12px; grid-template-columns:1fr}
+@media(min-width:760px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1140px){.cards{grid-template-columns:repeat(3,1fr)}}
+.card{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--radius); padding:14px 14px 12px;
+}
+.card header{display:flex; justify-content:space-between; gap:12px; align-items:flex-start}
+.ident{display:flex; gap:9px; min-width:0}
+.rank{
+  flex:none; width:22px; height:22px; border-radius:6px; margin-top:2px;
+  background:var(--accent-soft); color:var(--accent);
+  font-size:11px; font-weight:700; display:grid; place-items:center;
+  font-variant-numeric:tabular-nums;
+}
+.card h2{font-size:14.5px; margin:0; font-weight:650; line-height:1.35}
+.code{
+  font-variant-numeric:tabular-nums; color:var(--ink2);
+  font-size:12.5px; margin-right:4px;
+}
+.sector{margin:1px 0 0; font-size:11.5px; color:var(--ink3)}
+.score{flex:none; width:92px; text-align:right}
+.score-num{font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1}
+.score-num span{font-size:11px; color:var(--ink3); font-weight:500}
+.bar{height:5px; border-radius:3px; background:var(--line); margin-top:5px; overflow:hidden}
+.bar i{display:block; height:100%; border-radius:3px; background:var(--accent)}
+.grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:10px;
+  overflow:hidden; margin:12px 0 10px;
+}
+.cell{background:var(--surface); padding:6px 8px}
+.cell span{display:block; font-size:10.5px; color:var(--ink3)}
+.cell b{font-size:13.5px; font-weight:600; font-variant-numeric:tabular-nums}
+.foot{display:flex; justify-content:space-between; align-items:flex-end; gap:10px}
+.note{font-size:11.5px; color:var(--ink2)}
+.sparkwrap{flex:none; text-align:right; color:var(--accent)}
+.sparkwrap span{display:block; font-size:10px; color:var(--ink3); margin-top:-2px}
+.chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:10px}
+.chip{
+  font-size:10.5px; color:var(--ink2); background:var(--bg);
+  border:1px solid var(--line); border-radius:999px; padding:2px 8px;
+}
+.chip b{color:var(--accent); margin-left:4px; font-variant-numeric:tabular-nums}
+.empty{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:28px 18px; text-align:center; color:var(--ink2);
+}
+details.about{margin-top:26px; font-size:12.5px; color:var(--ink2)}
+details.about summary{cursor:pointer; color:var(--ink); font-weight:600}
+details.about table{border-collapse:collapse; margin-top:10px; width:100%}
+details.about th,details.about td{
+  border-bottom:1px solid var(--line); padding:5px 8px; text-align:left; font-weight:400;
+}
+details.about th{color:var(--ink3); font-size:11px}
+footer{margin-top:26px; font-size:11px; color:var(--ink3); line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>買い時スクリーニング</h1>
+    <p class="sub">最終更新 2026-09-22 23:13（日本時間）・株価基準 2026-09-18</p>
+    <div class="stats">
+      <div class="stat"><span>調べた銘柄</span><b>3,546</b></div>
+      <div class="stat"><span>条件通過</span><b>26</b></div>
+      <div class="stat"><span>表示</span><b>26</b></div>
+      <div class="stat"><span>最高点</span><b>75</b></div>
+    </div>
+  </div>
+
+  <div class="cards">
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">1</span>
+      <div>
+        <h2><span class="code">9028</span> ゼロ</h2>
+        <p class="sector">陸運業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">75<span>/95</span></div>
+      <div class="bar"><i style="width:79%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,310円</b></div><div class="cell"><span>PER</span><b>7.6倍</b></div><div class="cell"><span>PBR</span><b>1.16倍</b></div><div class="cell"><span>配当利回り</span><b>4.24%</b></div><div class="cell"><span>配当性向</span><b>32%</b></div><div class="cell"><span>自己資本比率</span><b>62%</b></div><div class="cell"><span>営業利益率</span><b>6.8%</b></div><div class="cell"><span>高値から</span><b>−11.0%</b></div><div class="cell"><span>レンジ日数</span><b>68日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年27.4%成長<br>
+      レンジ 3,295〜3,575円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,5.2 4.2,6.6 6.3,8.1 8.5,7.0 10.7,7.0 12.8,3.7 15.0,3.0 17.2,4.1 19.4,3.4 21.5,4.1 23.7,3.7 25.9,4.1 28.0,3.4 30.2,3.4 32.4,4.1 34.5,3.7 36.7,5.5 38.9,7.4 41.1,9.2 43.2,5.9 45.4,7.4 47.6,7.4 49.7,9.2 51.9,7.4 54.1,7.0 56.2,12.1 58.4,18.3 60.6,18.6 62.7,17.5 64.9,12.8 67.1,16.8 69.3,16.5 71.4,15.4 73.6,13.5 75.8,10.3 77.9,12.8 80.1,12.5 82.3,16.1 84.4,11.4 86.6,11.4 88.8,16.8 90.9,19.4 93.1,18.6 95.3,13.2 97.5,14.3 99.6,14.3 101.8,16.5 104.0,23.4 106.1,23.7 108.3,21.9 110.5,22.6 112.6,23.7 114.8,28.5 117.0,28.8 119.2,26.6 121.3,27.7 123.5,31.0 125.7,29.5 127.8,27.7 130.0,30.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="30.3" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">レンジ入り40日以上<b>+10</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">2</span>
+      <div>
+        <h2><span class="code">5285</span> ヤマックス</h2>
+        <p class="sector">ガラス･土石製品</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">70<span>/95</span></div>
+      <div class="bar"><i style="width:74%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>1,343円</b></div><div class="cell"><span>PER</span><b>7.8倍</b></div><div class="cell"><span>PBR</span><b>1.35倍</b></div><div class="cell"><span>配当利回り</span><b>4.47%</b></div><div class="cell"><span>配当性向</span><b>35%</b></div><div class="cell"><span>自己資本比率</span><b>64%</b></div><div class="cell"><span>営業利益率</span><b>11.2%</b></div><div class="cell"><span>高値から</span><b>−14.3%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年52.7%成長<br>
+      レンジ 1,328〜1,425円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,31.0 4.2,28.3 6.3,25.1 8.5,22.6 10.7,23.8 12.8,19.0 15.0,18.6 17.2,17.2 19.4,17.5 21.5,20.2 23.7,18.9 25.9,16.9 28.0,15.8 30.2,15.6 32.4,12.9 34.5,16.8 36.7,21.0 38.9,18.2 41.1,20.5 43.2,21.3 45.4,23.2 47.6,19.4 49.7,22.7 51.9,3.0 54.1,9.3 56.2,6.1 58.4,3.7 60.6,3.6 62.7,3.1 64.9,8.3 67.1,14.9 69.3,17.6 71.4,15.4 73.6,10.3 75.8,14.5 77.9,14.2 80.1,12.5 82.3,16.5 84.4,13.8 86.6,12.9 88.8,12.5 90.9,11.3 93.1,12.2 95.3,11.3 97.5,15.5 99.6,15.4 101.8,14.2 104.0,18.7 106.1,19.8 108.3,18.0 110.5,17.5 112.6,17.9 114.8,18.9 117.0,20.1 119.2,22.2 121.3,21.5 123.5,20.1 125.7,21.6 127.8,21.2 130.0,20.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="20.8" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">3</span>
+      <div>
+        <h2><span class="code">1928</span> 積水ハウス</h2>
+        <p class="sector">建設業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">65<span>/95</span></div>
+      <div class="bar"><i style="width:68%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,350円</b></div><div class="cell"><span>PER</span><b>9.7倍</b></div><div class="cell"><span>PBR</span><b>0.97倍</b></div><div class="cell"><span>配当利回り</span><b>4.33%</b></div><div class="cell"><span>配当性向</span><b>42%</b></div><div class="cell"><span>自己資本比率</span><b>44%</b></div><div class="cell"><span>営業利益率</span><b>8.1%</b></div><div class="cell"><span>高値から</span><b>−11.1%</b></div><div class="cell"><span>レンジ日数</span><b>17日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年10.4%成長<br>
+      レンジ 3,276〜3,528円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,31.0 4.2,27.4 6.3,25.0 8.5,24.9 10.7,26.1 12.8,22.5 15.0,21.2 17.2,16.4 19.4,16.7 21.5,17.6 23.7,19.4 25.9,20.6 28.0,19.6 30.2,17.4 32.4,16.9 34.5,14.6 36.7,15.2 38.9,15.0 41.1,16.3 43.2,17.1 45.4,15.7 47.6,9.6 49.7,8.5 51.9,3.0 54.1,12.7 56.2,18.6 58.4,25.6 60.6,26.8 62.7,26.6 64.9,23.0 67.1,22.2 69.3,22.4 71.4,22.5 73.6,22.3 75.8,21.2 77.9,23.5 80.1,24.9 82.3,25.4 84.4,21.6 86.6,19.6 88.8,19.2 90.9,20.3 93.1,20.2 95.3,20.3 97.5,22.2 99.6,21.1 101.8,19.7 104.0,23.2 106.1,23.7 108.3,25.1 110.5,27.4 112.6,29.7 114.8,28.6 117.0,25.5 119.2,26.2 121.3,25.9 123.5,27.3 125.7,27.1 127.8,23.7 130.0,26.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="26.8" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1倍割れ<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">4</span>
+      <div>
+        <h2><span class="code">8844</span> コスモスイニシア</h2>
+        <p class="sector">不動産業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">65<span>/95</span></div>
+      <div class="bar"><i style="width:68%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>1,243円</b></div><div class="cell"><span>PER</span><b>5.8倍</b></div><div class="cell"><span>PBR</span><b>0.75倍</b></div><div class="cell"><span>配当利回り</span><b>4.26%</b></div><div class="cell"><span>配当性向</span><b>25%</b></div><div class="cell"><span>自己資本比率</span><b>27%</b></div><div class="cell"><span>営業利益率</span><b>8.4%</b></div><div class="cell"><span>高値から</span><b>−17.7%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年39.1%成長<br>
+      レンジ 1,172〜1,306円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,28.0 4.2,26.3 6.3,23.0 8.5,21.0 10.7,13.2 12.8,10.4 15.0,8.8 17.2,5.7 19.4,3.0 21.5,10.8 23.7,10.2 25.9,10.9 28.0,14.7 30.2,13.2 32.4,9.4 34.5,11.5 36.7,12.9 38.9,9.7 41.1,13.9 43.2,15.2 45.4,17.3 47.6,17.1 49.7,18.0 51.9,16.0 54.1,16.6 56.2,18.5 58.4,20.4 60.6,23.3 62.7,23.7 64.9,25.5 67.1,30.6 69.3,31.0 71.4,27.6 73.6,28.0 75.8,27.0 77.9,25.2 80.1,24.2 82.3,26.9 84.4,24.4 86.6,25.0 88.8,22.9 90.9,22.4 93.1,21.6 95.3,23.2 97.5,23.0 99.6,24.9 101.8,23.6 104.0,26.3 106.1,26.3 108.3,26.1 110.5,26.7 112.6,27.2 114.8,28.9 117.0,29.4 119.2,30.8 121.3,28.1 123.5,28.4 125.7,27.0 127.8,26.3 130.0,27.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="27.0" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1倍割れ<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">5</span>
+      <div>
+        <h2><span class="code">2337</span> いちご</h2>
+        <p class="sector">不動産業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">60<span>/95</span></div>
+      <div class="bar"><i style="width:63%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>406円</b></div><div class="cell"><span>PER</span><b>8.9倍</b></div><div class="cell"><span>PBR</span><b>1.47倍</b></div><div class="cell"><span>配当利回り</span><b>3.82%</b></div><div class="cell"><span>配当性向</span><b>34%</b></div><div class="cell"><span>自己資本比率</span><b>24%</b></div><div class="cell"><span>営業利益率</span><b>22.1%</b></div><div class="cell"><span>高値から</span><b>−10.2%</b></div><div class="cell"><span>レンジ日数</span><b>17日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年19.5%成長<br>
+      レンジ 387〜417円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,14.5 4.2,9.9 6.3,5.3 8.5,7.6 10.7,11.3 12.8,10.3 15.0,9.0 17.2,5.8 19.4,3.9 21.5,3.0 23.7,7.1 25.9,6.2 28.0,9.0 30.2,7.1 32.4,5.8 34.5,19.5 36.7,11.7 38.9,18.1 41.1,15.4 43.2,13.6 45.4,14.9 47.6,11.3 49.7,12.2 51.9,11.7 54.1,13.1 56.2,19.5 58.4,25.5 60.6,29.6 62.7,28.2 64.9,27.8 67.1,26.4 69.3,26.4 71.4,24.6 73.6,21.8 75.8,22.7 77.9,22.7 80.1,22.7 82.3,24.6 84.4,22.7 86.6,20.0 88.8,20.0 90.9,20.4 93.1,20.4 95.3,20.9 97.5,22.7 99.6,25.0 101.8,26.4 104.0,31.0 106.1,28.7 108.3,28.7 110.5,30.1 112.6,30.1 114.8,29.2 117.0,25.5 119.2,25.5 121.3,25.5 123.5,24.1 125.7,24.6 127.8,21.4 130.0,23.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="23.2" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">営業利益率15%以上<b>+10</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">6</span>
+      <div>
+        <h2><span class="code">1952</span> 新日本空調</h2>
+        <p class="sector">建設業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">60<span>/95</span></div>
+      <div class="bar"><i style="width:63%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,240円</b></div><div class="cell"><span>PER</span><b>11.5倍</b></div><div class="cell"><span>PBR</span><b>1.82倍</b></div><div class="cell"><span>配当利回り</span><b>3.70%</b></div><div class="cell"><span>配当性向</span><b>43%</b></div><div class="cell"><span>自己資本比率</span><b>66%</b></div><div class="cell"><span>営業利益率</span><b>9.8%</b></div><div class="cell"><span>高値から</span><b>−18.8%</b></div><div class="cell"><span>レンジ日数</span><b>10日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年21.8%成長<br>
+      レンジ 3,010〜3,280円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,11.9 4.2,9.6 6.3,7.8 8.5,8.4 10.7,7.8 12.8,7.5 15.0,7.0 17.2,3.0 19.4,4.9 21.5,9.7 23.7,12.5 25.9,13.4 28.0,17.5 30.2,17.2 32.4,14.7 34.5,15.5 36.7,18.5 38.9,16.5 41.1,16.2 43.2,17.2 45.4,16.6 47.6,17.2 49.7,20.4 51.9,26.6 54.1,24.5 56.2,23.4 58.4,24.5 60.6,22.5 62.7,16.2 64.9,19.0 67.1,29.8 69.3,29.8 71.4,29.1 73.6,27.3 75.8,26.3 77.9,25.6 80.1,27.8 82.3,31.0 84.4,28.5 86.6,30.1 88.8,27.9 90.9,27.9 93.1,27.0 95.3,27.0 97.5,26.9 99.6,24.5 101.8,24.0 104.0,26.7 106.1,26.2 108.3,26.5 110.5,23.8 112.6,25.4 114.8,24.3 117.0,25.7 119.2,26.3 121.3,25.9 123.5,25.0 125.7,24.1 127.8,22.5 130.0,23.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="23.4" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">7</span>
+      <div>
+        <h2><span class="code">2674</span> ハードオフコーポレーション</h2>
+        <p class="sector">小売業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">60<span>/95</span></div>
+      <div class="bar"><i style="width:63%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>2,595円</b></div><div class="cell"><span>PER</span><b>10.9倍</b></div><div class="cell"><span>PBR</span><b>1.82倍</b></div><div class="cell"><span>配当利回り</span><b>3.55%</b></div><div class="cell"><span>配当性向</span><b>39%</b></div><div class="cell"><span>自己資本比率</span><b>62%</b></div><div class="cell"><span>営業利益率</span><b>8.6%</b></div><div class="cell"><span>高値から</span><b>−16.2%</b></div><div class="cell"><span>レンジ日数</span><b>1日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年22.0%成長<br>
+      レンジ 2,480〜2,763円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,23.9 4.2,25.5 6.3,22.5 8.5,22.8 10.7,27.0 12.8,25.8 15.0,24.7 17.2,26.3 19.4,22.3 21.5,19.4 23.7,20.7 25.9,21.8 28.0,23.4 30.2,21.7 32.4,20.7 34.5,19.0 36.7,19.2 38.9,13.6 41.1,15.0 43.2,16.5 45.4,15.8 47.6,13.3 49.7,11.0 51.9,3.0 54.1,5.6 56.2,11.8 58.4,8.7 60.6,11.3 62.7,13.8 64.9,16.1 67.1,15.6 69.3,13.6 71.4,14.8 73.6,17.4 75.8,17.5 77.9,21.1 80.1,19.6 82.3,21.2 84.4,17.0 86.6,20.3 88.8,22.0 90.9,20.4 93.1,21.5 95.3,22.8 97.5,22.7 99.6,21.2 101.8,21.5 104.0,24.7 106.1,21.5 108.3,25.9 110.5,27.4 112.6,27.1 114.8,28.8 117.0,29.9 119.2,31.0 121.3,29.3 123.5,28.7 125.7,27.5 127.8,26.5 130.0,26.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="26.5" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">8</span>
+      <div>
+        <h2><span class="code">9142</span> 九州旅客鉄道</h2>
+        <p class="sector">陸運業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">60<span>/95</span></div>
+      <div class="bar"><i style="width:63%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,461円</b></div><div class="cell"><span>PER</span><b>10.3倍</b></div><div class="cell"><span>PBR</span><b>1.07倍</b></div><div class="cell"><span>配当利回り</span><b>3.50%</b></div><div class="cell"><span>配当性向</span><b>36%</b></div><div class="cell"><span>自己資本比率</span><b>40%</b></div><div class="cell"><span>営業利益率</span><b>14.8%</b></div><div class="cell"><span>高値から</span><b>−10.2%</b></div><div class="cell"><span>レンジ日数</span><b>17日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年108.2%成長<br>
+      レンジ 3,461〜3,670円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,28.8 4.2,26.8 6.3,21.8 8.5,25.3 10.7,29.7 12.8,24.8 15.0,23.2 17.2,17.9 19.4,15.7 21.5,17.4 23.7,19.5 25.9,21.9 28.0,19.5 30.2,18.1 32.4,17.1 34.5,17.8 36.7,15.2 38.9,14.2 41.1,16.2 43.2,17.9 45.4,13.9 47.6,8.9 49.7,4.9 51.9,3.0 54.1,7.1 56.2,18.2 58.4,27.8 60.6,31.0 62.7,30.2 64.9,28.8 67.1,27.7 69.3,28.5 71.4,26.3 73.6,26.8 75.8,25.9 77.9,27.0 80.1,28.3 82.3,28.8 84.4,29.4 86.6,23.9 88.8,23.9 90.9,21.9 93.1,22.4 95.3,18.6 97.5,18.3 99.6,16.6 101.8,15.7 104.0,17.2 106.1,16.8 108.3,19.3 110.5,21.9 112.6,21.9 114.8,21.5 117.0,21.5 119.2,24.6 121.3,19.6 123.5,20.7 125.7,22.2 127.8,19.1 130.0,27.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="27.7" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">9</span>
+      <div>
+        <h2><span class="code">3300</span> アンビション　ＤＸ　ホールディングス</h2>
+        <p class="sector">不動産業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>1,893円</b></div><div class="cell"><span>PER</span><b>5.4倍</b></div><div class="cell"><span>PBR</span><b>1.44倍</b></div><div class="cell"><span>配当利回り</span><b>5.81%</b></div><div class="cell"><span>配当性向</span><b>31%</b></div><div class="cell"><span>自己資本比率</span><b>21%</b></div><div class="cell"><span>営業利益率</span><b>7.6%</b></div><div class="cell"><span>高値から</span><b>−17.6%</b></div><div class="cell"><span>レンジ日数</span><b>5日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年28.8%成長<br>
+      レンジ 1,795〜1,980円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,12.0 4.2,12.7 6.3,20.2 8.5,17.1 10.7,15.7 12.8,13.9 15.0,13.2 17.2,11.8 19.4,13.4 21.5,14.2 23.7,14.5 25.9,14.1 28.0,12.4 30.2,11.4 32.4,10.5 34.5,11.7 36.7,13.1 38.9,11.5 41.1,11.4 43.2,13.3 45.4,13.7 47.6,11.4 49.7,13.7 51.9,12.8 54.1,13.2 56.2,13.8 58.4,14.2 60.6,12.8 62.7,11.6 64.9,10.6 67.1,11.5 69.3,9.4 71.4,7.1 73.6,3.0 75.8,18.4 77.9,19.3 80.1,22.3 82.3,23.2 84.4,22.6 86.6,23.1 88.8,21.6 90.9,22.0 93.1,21.4 95.3,22.4 97.5,23.9 99.6,24.7 101.8,25.7 104.0,31.0 106.1,30.4 108.3,29.8 110.5,29.5 112.6,30.1 114.8,30.0 117.0,28.0 119.2,29.7 121.3,28.3 123.5,27.4 125.7,27.0 127.8,27.1 130.0,25.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="25.5" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">10</span>
+      <div>
+        <h2><span class="code">1975</span> 朝日工業社</h2>
+        <p class="sector">建設業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,915円</b></div><div class="cell"><span>PER</span><b>11.0倍</b></div><div class="cell"><span>PBR</span><b>1.98倍</b></div><div class="cell"><span>配当利回り</span><b>3.68%</b></div><div class="cell"><span>配当性向</span><b>40%</b></div><div class="cell"><span>自己資本比率</span><b>56%</b></div><div class="cell"><span>営業利益率</span><b>11.1%</b></div><div class="cell"><span>高値から</span><b>−19.4%</b></div><div class="cell"><span>レンジ日数</span><b>12日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年50.3%成長<br>
+      レンジ 3,700〜4,060円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,12.8 4.2,11.1 6.3,10.1 8.5,8.4 10.7,8.2 12.8,13.5 15.0,8.2 17.2,5.5 19.4,3.0 21.5,6.1 23.7,8.8 25.9,9.2 28.0,18.1 30.2,17.3 32.4,13.7 34.5,15.7 36.7,22.9 38.9,21.4 41.1,20.0 43.2,21.2 45.4,18.4 47.6,19.5 49.7,23.6 51.9,31.0 54.1,30.6 56.2,27.6 58.4,29.4 60.6,29.3 62.7,22.7 64.9,23.5 67.1,28.0 69.3,29.4 71.4,28.6 73.6,27.3 75.8,26.6 77.9,23.6 80.1,23.9 82.3,29.6 84.4,27.0 86.6,26.6 88.8,24.6 90.9,25.8 93.1,24.2 95.3,24.2 97.5,24.6 99.6,23.8 101.8,21.4 104.0,26.3 106.1,26.1 108.3,25.8 110.5,21.8 112.6,24.6 114.8,23.8 117.0,25.5 119.2,29.3 121.3,28.2 123.5,27.5 125.7,24.8 127.8,22.2 130.0,24.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="24.4" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">11</span>
+      <div>
+        <h2><span class="code">7972</span> イトーキ</h2>
+        <p class="sector">その他製品</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>2,492円</b></div><div class="cell"><span>PER</span><b>11.0倍</b></div><div class="cell"><span>PBR</span><b>1.99倍</b></div><div class="cell"><span>配当利回り</span><b>3.61%</b></div><div class="cell"><span>配当性向</span><b>40%</b></div><div class="cell"><span>自己資本比率</span><b>48%</b></div><div class="cell"><span>営業利益率</span><b>8.9%</b></div><div class="cell"><span>高値から</span><b>−16.1%</b></div><div class="cell"><span>レンジ日数</span><b>11日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年52.4%成長<br>
+      レンジ 2,366〜2,670円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,21.7 4.2,18.7 6.3,16.9 8.5,18.1 10.7,19.1 12.8,17.5 15.0,13.7 17.2,8.4 19.4,7.4 21.5,7.2 23.7,7.6 25.9,9.6 28.0,12.1 30.2,8.3 32.4,7.6 34.5,10.1 36.7,14.2 38.9,7.2 41.1,7.3 43.2,7.8 45.4,7.0 47.6,3.1 49.7,4.8 51.9,5.7 54.1,5.0 56.2,3.0 58.4,5.9 60.6,5.3 62.7,5.0 64.9,3.9 67.1,22.6 69.3,21.7 71.4,19.7 73.6,17.1 75.8,16.6 77.9,19.2 80.1,22.1 82.3,24.9 84.4,22.4 86.6,22.0 88.8,20.4 90.9,20.9 93.1,18.0 95.3,20.5 97.5,18.3 99.6,16.8 101.8,19.0 104.0,23.2 106.1,23.5 108.3,23.5 110.5,23.8 112.6,26.1 114.8,26.6 117.0,27.5 119.2,31.0 121.3,27.4 123.5,26.7 125.7,26.2 127.8,23.7 130.0,25.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="25.7" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">12</span>
+      <div>
+        <h2><span class="code">6858</span> 小野測器</h2>
+        <p class="sector">電気機器</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>834円</b></div><div class="cell"><span>PER</span><b>10.8倍</b></div><div class="cell"><span>PBR</span><b>0.51倍</b></div><div class="cell"><span>配当利回り</span><b>3.60%</b></div><div class="cell"><span>配当性向</span><b>39%</b></div><div class="cell"><span>自己資本比率</span><b>74%</b></div><div class="cell"><span>営業利益率</span><b>4.3%</b></div><div class="cell"><span>高値から</span><b>−11.9%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年—成長<br>
+      レンジ 812〜865円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,3.0 4.2,7.7 6.3,10.0 8.5,10.0 10.7,9.2 12.8,8.1 15.0,4.9 17.2,6.4 19.4,11.8 21.5,17.7 23.7,12.8 25.9,10.7 28.0,13.3 30.2,12.8 32.4,8.6 34.5,10.1 36.7,14.7 38.9,11.5 41.1,8.6 43.2,10.5 45.4,11.3 47.6,22.9 49.7,27.6 51.9,31.0 54.1,29.3 56.2,26.1 58.4,23.3 60.6,20.5 62.7,14.7 64.9,16.5 67.1,19.2 69.3,15.6 71.4,17.7 73.6,14.7 75.8,15.8 77.9,14.5 80.1,16.9 82.3,23.1 84.4,20.9 86.6,20.5 88.8,21.8 90.9,21.6 93.1,21.4 95.3,20.7 97.5,21.4 99.6,19.5 101.8,19.0 104.0,20.1 106.1,22.0 108.3,21.0 110.5,16.9 112.6,17.8 114.8,17.8 117.0,18.2 119.2,20.3 121.3,18.8 123.5,20.9 125.7,19.3 127.8,18.6 130.0,19.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="19.2" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">PBR1倍割れ<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">13</span>
+      <div>
+        <h2><span class="code">6498</span> キッツ</h2>
+        <p class="sector">機械</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>1,973円</b></div><div class="cell"><span>PER</span><b>12.8倍</b></div><div class="cell"><span>PBR</span><b>1.38倍</b></div><div class="cell"><span>配当利回り</span><b>3.14%</b></div><div class="cell"><span>配当性向</span><b>40%</b></div><div class="cell"><span>自己資本比率</span><b>58%</b></div><div class="cell"><span>営業利益率</span><b>8.7%</b></div><div class="cell"><span>高値から</span><b>−25.5%</b></div><div class="cell"><span>レンジ日数</span><b>4日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年14.5%成長<br>
+      レンジ 1,838〜2,003円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,3.0 4.2,4.8 6.3,5.5 8.5,5.9 10.7,3.9 12.8,6.7 15.0,4.2 17.2,3.2 19.4,9.0 21.5,11.5 23.7,11.6 25.9,10.7 28.0,13.1 30.2,13.7 32.4,11.0 34.5,12.0 36.7,18.7 38.9,14.9 41.1,14.2 43.2,14.0 45.4,15.4 47.6,14.9 49.7,21.7 51.9,24.8 54.1,24.6 56.2,18.4 58.4,17.1 60.6,13.9 62.7,9.2 64.9,10.7 67.1,22.5 69.3,25.1 71.4,22.7 73.6,22.9 75.8,23.3 77.9,22.4 80.1,25.2 82.3,29.4 84.4,28.4 86.6,28.8 88.8,28.4 90.9,28.2 93.1,27.2 95.3,27.9 97.5,29.2 99.6,29.1 101.8,29.7 104.0,31.0 106.1,30.7 108.3,30.5 110.5,28.2 112.6,30.0 114.8,28.4 117.0,28.9 119.2,29.2 121.3,29.2 123.5,28.9 125.7,28.2 127.8,27.4 130.0,27.1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="27.1" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から20〜30%下落<b>+10</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">14</span>
+      <div>
+        <h2><span class="code">7130</span> ヤマエグループホールディングス</h2>
+        <p class="sector">卸売業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>2,809円</b></div><div class="cell"><span>PER</span><b>6.2倍</b></div><div class="cell"><span>PBR</span><b>0.71倍</b></div><div class="cell"><span>配当利回り</span><b>2.85%</b></div><div class="cell"><span>配当性向</span><b>18%</b></div><div class="cell"><span>自己資本比率</span><b>24%</b></div><div class="cell"><span>営業利益率</span><b>1.7%</b></div><div class="cell"><span>高値から</span><b>−10.3%</b></div><div class="cell"><span>レンジ日数</span><b>25日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年27.3%成長<br>
+      レンジ 2,756〜2,996円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,29.1 4.2,28.2 6.3,24.3 8.5,24.0 10.7,22.8 12.8,17.2 15.0,13.7 17.2,11.0 19.4,9.7 21.5,8.9 23.7,8.5 25.9,8.9 28.0,8.9 30.2,6.8 32.4,3.4 34.5,3.0 36.7,10.6 38.9,9.3 41.1,11.0 43.2,16.0 45.4,22.8 47.6,20.4 49.7,20.9 51.9,19.9 54.1,19.5 56.2,27.0 58.4,24.9 60.6,26.0 62.7,26.9 64.9,22.2 67.1,22.1 69.3,20.0 71.4,20.8 73.6,20.7 75.8,17.6 77.9,19.3 80.1,18.8 82.3,22.0 84.4,16.5 86.6,16.5 88.8,13.0 90.9,18.3 93.1,19.4 95.3,19.9 97.5,22.3 99.6,22.9 101.8,22.8 104.0,19.9 106.1,24.9 108.3,25.6 110.5,26.1 112.6,26.0 114.8,27.6 117.0,28.7 119.2,31.0 121.3,29.5 123.5,29.1 125.7,28.4 127.8,24.7 130.0,27.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="27.5" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20%未満<b>+5</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1倍割れ<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">レンジ入り20日以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">15</span>
+      <div>
+        <h2><span class="code">2875</span> 東洋水産</h2>
+        <p class="sector">食料品</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>9,737円</b></div><div class="cell"><span>PER</span><b>14.4倍</b></div><div class="cell"><span>PBR</span><b>1.76倍</b></div><div class="cell"><span>配当利回り</span><b>2.26%</b></div><div class="cell"><span>配当性向</span><b>33%</b></div><div class="cell"><span>自己資本比率</span><b>83%</b></div><div class="cell"><span>営業利益率</span><b>16.0%</b></div><div class="cell"><span>高値から</span><b>−15.8%</b></div><div class="cell"><span>レンジ日数</span><b>15日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年30.3%成長<br>
+      レンジ 9,685〜10,890円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,29.4 4.2,22.7 6.3,19.9 8.5,20.5 10.7,23.1 12.8,19.3 15.0,18.0 17.2,12.7 19.4,12.0 21.5,13.2 23.7,14.8 25.9,18.4 28.0,17.2 30.2,16.0 32.4,18.0 34.5,17.8 36.7,12.9 38.9,13.1 41.1,15.4 43.2,16.2 45.4,15.4 47.6,11.4 49.7,7.1 51.9,3.0 54.1,4.7 56.2,20.8 58.4,24.9 60.6,26.5 62.7,23.9 64.9,20.8 67.1,15.5 69.3,17.1 71.4,18.4 73.6,18.9 75.8,16.8 77.9,17.1 80.1,17.2 82.3,18.6 84.4,16.3 86.6,16.0 88.8,14.3 90.9,16.6 93.1,16.0 95.3,19.7 97.5,17.4 99.6,18.8 101.8,16.8 104.0,17.5 106.1,20.6 108.3,21.6 110.5,23.9 112.6,25.0 114.8,24.9 117.0,25.5 119.2,26.6 121.3,25.0 123.5,26.2 125.7,28.4 127.8,27.2 130.0,31.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="31.0" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率15%以上<b>+10</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">16</span>
+      <div>
+        <h2><span class="code">9022</span> 東海旅客鉄道</h2>
+        <p class="sector">陸運業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">55<span>/95</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,815円</b></div><div class="cell"><span>PER</span><b>8.1倍</b></div><div class="cell"><span>PBR</span><b>0.70倍</b></div><div class="cell"><span>配当利回り</span><b>0.84%</b></div><div class="cell"><span>配当性向</span><b>7%</b></div><div class="cell"><span>自己資本比率</span><b>48%</b></div><div class="cell"><span>営業利益率</span><b>41.4%</b></div><div class="cell"><span>高値から</span><b>−11.1%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年369.5%成長<br>
+      レンジ 3,753〜4,043円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,31.0 4.2,28.5 6.3,26.5 8.5,27.0 10.7,29.7 12.8,27.5 15.0,25.6 17.2,24.2 19.4,19.9 21.5,21.0 23.7,21.1 25.9,22.3 28.0,21.2 30.2,19.6 32.4,20.0 34.5,19.6 36.7,17.8 38.9,15.6 41.1,16.9 43.2,15.8 45.4,13.9 47.6,9.8 49.7,7.7 51.9,3.0 54.1,5.1 56.2,10.9 58.4,13.6 60.6,16.1 62.7,15.8 64.9,15.3 67.1,13.6 69.3,15.3 71.4,16.1 73.6,15.7 75.8,14.9 77.9,16.9 80.1,15.7 82.3,15.5 84.4,14.7 86.6,12.5 88.8,12.9 90.9,11.7 93.1,12.5 95.3,11.9 97.5,12.6 99.6,11.3 101.8,10.5 104.0,12.3 106.1,13.5 108.3,15.0 110.5,16.9 112.6,15.4 114.8,14.7 117.0,15.7 119.2,16.8 121.3,14.7 123.5,15.4 125.7,16.9 127.8,15.4 130.0,16.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="16.3" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当性向20%未満<b>+5</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1倍割れ<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益率15%以上<b>+10</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">17</span>
+      <div>
+        <h2><span class="code">7606</span> ユナイテッドアローズ</h2>
+        <p class="sector">小売業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">50<span>/95</span></div>
+      <div class="bar"><i style="width:53%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>2,386円</b></div><div class="cell"><span>PER</span><b>10.6倍</b></div><div class="cell"><span>PBR</span><b>1.56倍</b></div><div class="cell"><span>配当利回り</span><b>4.69%</b></div><div class="cell"><span>配当性向</span><b>50%</b></div><div class="cell"><span>自己資本比率</span><b>60%</b></div><div class="cell"><span>営業利益率</span><b>5.5%</b></div><div class="cell"><span>高値から</span><b>−10.3%</b></div><div class="cell"><span>レンジ日数</span><b>1日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年52.6%成長<br>
+      レンジ 2,285〜2,570円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,23.1 4.2,18.2 6.3,19.5 8.5,23.6 10.7,28.1 12.8,23.2 15.0,18.6 17.2,17.0 19.4,15.8 21.5,9.7 23.7,16.0 25.9,20.1 28.0,20.4 30.2,18.5 32.4,18.6 34.5,17.7 36.7,19.1 38.9,19.1 41.1,21.5 43.2,21.3 45.4,21.9 47.6,18.8 49.7,17.4 51.9,11.6 54.1,14.5 56.2,19.6 58.4,18.2 60.6,17.8 62.7,18.4 64.9,13.8 67.1,7.0 69.3,3.0 71.4,6.1 73.6,8.4 75.8,7.5 77.9,10.6 80.1,10.7 82.3,4.7 84.4,4.8 86.6,7.8 88.8,12.7 90.9,11.8 93.1,14.8 95.3,13.7 97.5,15.5 99.6,15.8 101.8,15.5 104.0,24.1 106.1,23.7 108.3,22.0 110.5,23.7 112.6,25.9 114.8,28.6 117.0,29.1 119.2,31.0 121.3,25.0 123.5,23.6 125.7,22.5 127.8,20.7 130.0,23.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="23.2" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り3%以上<b>+15</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PER12倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">18</span>
+      <div>
+        <h2><span class="code">8227</span> しまむら</h2>
+        <p class="sector">小売業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">50<span>/95</span></div>
+      <div class="bar"><i style="width:53%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,185円</b></div><div class="cell"><span>PER</span><b>14.0倍</b></div><div class="cell"><span>PBR</span><b>1.34倍</b></div><div class="cell"><span>配当利回り</span><b>2.51%</b></div><div class="cell"><span>配当性向</span><b>35%</b></div><div class="cell"><span>自己資本比率</span><b>85%</b></div><div class="cell"><span>営業利益率</span><b>8.8%</b></div><div class="cell"><span>高値から</span><b>−11.6%</b></div><div class="cell"><span>レンジ日数</span><b>39日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年5.6%成長<br>
+      レンジ 3,137〜3,425円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,24.6 4.2,27.2 6.3,21.1 8.5,19.2 10.7,26.9 12.8,21.3 15.0,18.2 17.2,12.6 19.4,6.9 21.5,11.2 23.7,12.6 25.9,20.7 28.0,18.5 30.2,18.3 32.4,19.9 34.5,18.6 36.7,16.8 38.9,19.1 41.1,21.0 43.2,20.2 45.4,22.0 47.6,17.1 49.7,12.3 51.9,3.0 54.1,7.4 56.2,18.5 58.4,15.4 60.6,19.7 62.7,21.4 64.9,17.8 67.1,13.6 69.3,9.2 71.4,14.3 73.6,15.5 75.8,16.0 77.9,18.7 80.1,16.0 82.3,19.1 84.4,22.7 86.6,19.9 88.8,15.7 90.9,20.4 93.1,20.2 95.3,21.1 97.5,21.5 99.6,23.8 101.8,22.8 104.0,25.3 106.1,26.7 108.3,25.5 110.5,24.9 112.6,22.2 114.8,26.9 117.0,28.9 119.2,31.0 121.3,26.7 123.5,27.9 125.7,29.8 127.8,26.4 130.0,30.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="30.0" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">レンジ入り20日以上<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率8%以上<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">19</span>
+      <div>
+        <h2><span class="code">4901</span> 富士フイルムホールディングス</h2>
+        <p class="sector">化学</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">50<span>/95</span></div>
+      <div class="bar"><i style="width:53%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,324円</b></div><div class="cell"><span>PER</span><b>14.2倍</b></div><div class="cell"><span>PBR</span><b>1.02倍</b></div><div class="cell"><span>配当利回り</span><b>2.26%</b></div><div class="cell"><span>配当性向</span><b>32%</b></div><div class="cell"><span>自己資本比率</span><b>63%</b></div><div class="cell"><span>営業利益率</span><b>10.4%</b></div><div class="cell"><span>高値から</span><b>−14.9%</b></div><div class="cell"><span>レンジ日数</span><b>11日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年11.1%成長<br>
+      レンジ 3,162〜3,463円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,20.6 4.2,19.7 6.3,16.8 8.5,17.9 10.7,18.6 12.8,16.8 15.0,12.7 17.2,12.7 19.4,11.8 21.5,14.5 23.7,15.0 25.9,14.0 28.0,14.8 30.2,11.7 32.4,12.7 34.5,12.6 36.7,12.3 38.9,10.8 41.1,11.1 43.2,11.3 45.4,12.5 47.6,4.8 49.7,7.7 51.9,3.5 54.1,4.8 56.2,7.0 58.4,6.8 60.6,8.1 62.7,4.9 64.9,3.0 67.1,27.3 69.3,30.1 71.4,28.7 73.6,25.7 75.8,23.8 77.9,27.1 80.1,29.3 82.3,31.0 84.4,27.9 86.6,28.0 88.8,25.6 90.9,26.8 93.1,24.9 95.3,25.0 97.5,24.2 99.6,21.5 101.8,18.9 104.0,23.1 106.1,24.0 108.3,24.4 110.5,27.2 112.6,28.8 114.8,28.7 117.0,27.4 119.2,27.7 121.3,26.4 123.5,27.5 125.7,24.9 127.8,23.3 130.0,24.0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="24.0" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">20</span>
+      <div>
+        <h2><span class="code">9042</span> 阪急阪神ホールディングス</h2>
+        <p class="sector">陸運業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">50<span>/95</span></div>
+      <div class="bar"><i style="width:53%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>4,612円</b></div><div class="cell"><span>PER</span><b>13.6倍</b></div><div class="cell"><span>PBR</span><b>0.97倍</b></div><div class="cell"><span>配当利回り</span><b>2.17%</b></div><div class="cell"><span>配当性向</span><b>29%</b></div><div class="cell"><span>自己資本比率</span><b>31%</b></div><div class="cell"><span>営業利益率</span><b>10.6%</b></div><div class="cell"><span>高値から</span><b>−11.0%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年34.2%成長<br>
+      レンジ 4,590〜4,812円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,31.0 4.2,30.7 6.3,27.1 8.5,26.9 10.7,29.0 12.8,23.7 15.0,21.9 17.2,18.5 19.4,15.8 21.5,13.7 23.7,15.0 25.9,17.5 28.0,15.3 30.2,13.9 32.4,14.7 34.5,14.6 36.7,15.3 38.9,13.9 41.1,15.3 43.2,17.3 45.4,14.2 47.6,9.0 49.7,7.2 51.9,3.0 54.1,5.9 56.2,14.3 58.4,16.7 60.6,20.2 62.7,21.6 64.9,18.9 67.1,17.4 69.3,19.1 71.4,16.9 73.6,16.3 75.8,16.2 77.9,16.6 80.1,16.1 82.3,16.5 84.4,15.2 86.6,14.1 88.8,13.2 90.9,12.7 93.1,13.7 95.3,12.9 97.5,13.2 99.6,14.7 101.8,15.2 104.0,16.2 106.1,15.2 108.3,14.6 110.5,15.8 112.6,14.5 114.8,15.0 117.0,16.2 119.2,17.1 121.3,15.2 123.5,15.7 125.7,17.1 127.8,15.4 130.0,17.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="17.2" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PBR1倍割れ<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">営業利益率8%以上<b>+5</b></span><span class="chip">営業利益 年20%成長<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">21</span>
+      <div>
+        <h2><span class="code">4403</span> 日油</h2>
+        <p class="sector">化学</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">45<span>/95</span></div>
+      <div class="bar"><i style="width:47%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>2,588円</b></div><div class="cell"><span>PER</span><b>14.9倍</b></div><div class="cell"><span>PBR</span><b>1.98倍</b></div><div class="cell"><span>配当利回り</span><b>2.70%</b></div><div class="cell"><span>配当性向</span><b>40%</b></div><div class="cell"><span>自己資本比率</span><b>77%</b></div><div class="cell"><span>営業利益率</span><b>18.4%</b></div><div class="cell"><span>高値から</span><b>−10.6%</b></div><div class="cell"><span>レンジ日数</span><b>17日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年7.4%成長<br>
+      レンジ 2,552〜2,812円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,30.1 4.2,31.0 6.3,25.5 8.5,24.2 10.7,22.1 12.8,14.5 15.0,5.8 17.2,3.0 19.4,4.6 21.5,9.3 23.7,9.2 25.9,13.8 28.0,15.7 30.2,12.5 32.4,11.2 34.5,13.5 36.7,16.3 38.9,13.9 41.1,13.3 43.2,11.8 45.4,12.7 47.6,4.7 49.7,8.0 51.9,4.7 54.1,7.0 56.2,8.6 58.4,11.4 60.6,11.9 62.7,21.2 64.9,12.5 67.1,10.3 69.3,16.2 71.4,12.5 73.6,11.6 75.8,14.7 77.9,11.5 80.1,12.8 82.3,17.2 84.4,11.5 86.6,9.3 88.8,8.5 90.9,10.3 93.1,9.0 95.3,7.3 97.5,12.0 99.6,16.6 101.8,12.5 104.0,18.9 106.1,20.9 108.3,24.6 110.5,25.9 112.6,29.3 114.8,22.6 117.0,26.2 119.2,28.4 121.3,28.5 123.5,29.9 125.7,30.1 127.8,27.0 130.0,29.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="29.5" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率60%以上<b>+10</b></span><span class="chip">営業利益率15%以上<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">22</span>
+      <div>
+        <h2><span class="code">7522</span> ワタミ</h2>
+        <p class="sector">小売業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">45<span>/95</span></div>
+      <div class="bar"><i style="width:47%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>908円</b></div><div class="cell"><span>PER</span><b>7.0倍</b></div><div class="cell"><span>PBR</span><b>1.22倍</b></div><div class="cell"><span>配当利回り</span><b>1.10%</b></div><div class="cell"><span>配当性向</span><b>8%</b></div><div class="cell"><span>自己資本比率</span><b>41%</b></div><div class="cell"><span>営業利益率</span><b>5.2%</b></div><div class="cell"><span>高値から</span><b>−10.7%</b></div><div class="cell"><span>レンジ日数</span><b>86日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年—成長<br>
+      レンジ 901〜990円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,26.3 4.2,26.9 6.3,18.8 8.5,22.0 10.7,24.9 12.8,22.8 15.0,24.3 17.2,23.1 19.4,20.8 21.5,18.2 23.7,21.7 25.9,22.8 28.0,22.5 30.2,22.5 32.4,19.3 34.5,19.6 36.7,19.6 38.9,18.2 41.1,19.3 43.2,21.4 45.4,19.9 47.6,15.5 49.7,15.5 51.9,9.7 54.1,13.5 56.2,19.3 58.4,20.8 60.6,22.2 62.7,23.4 64.9,22.0 67.1,19.9 69.3,20.2 71.4,16.4 73.6,15.2 75.8,3.0 77.9,11.5 80.1,12.9 82.3,13.2 84.4,12.0 86.6,10.9 88.8,9.1 90.9,10.6 93.1,10.9 95.3,12.6 97.5,13.5 99.6,10.6 101.8,14.7 104.0,17.9 106.1,17.6 108.3,18.5 110.5,22.2 112.6,24.3 114.8,26.0 117.0,28.4 119.2,31.0 121.3,29.2 123.5,27.5 125.7,29.8 127.8,28.1 130.0,29.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="29.8" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り1%以上<b>+5</b></span><span class="chip">配当性向20%未満<b>+5</b></span><span class="chip">PER10倍以下<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">レンジ入り40日以上<b>+10</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">23</span>
+      <div>
+        <h2><span class="code">1812</span> 鹿島建設</h2>
+        <p class="sector">建設業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">40<span>/95</span></div>
+      <div class="bar"><i style="width:42%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>4,979円</b></div><div class="cell"><span>PER</span><b>13.5倍</b></div><div class="cell"><span>PBR</span><b>1.68倍</b></div><div class="cell"><span>配当利回り</span><b>2.93%</b></div><div class="cell"><span>配当性向</span><b>40%</b></div><div class="cell"><span>自己資本比率</span><b>40%</b></div><div class="cell"><span>営業利益率</span><b>7.8%</b></div><div class="cell"><span>高値から</span><b>−21.5%</b></div><div class="cell"><span>レンジ日数</span><b>11日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年18.2%成長<br>
+      レンジ 4,711〜5,232円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,13.2 4.2,11.4 6.3,9.6 8.5,9.5 10.7,7.9 12.8,7.3 15.0,4.8 17.2,3.0 19.4,5.5 21.5,10.1 23.7,10.6 25.9,11.6 28.0,14.0 30.2,15.3 32.4,12.4 34.5,13.0 36.7,15.9 38.9,14.4 41.1,14.5 43.2,13.5 45.4,14.9 47.6,13.5 49.7,16.6 51.9,18.2 54.1,18.5 56.2,18.5 58.4,20.8 60.6,19.8 62.7,20.9 64.9,23.0 67.1,24.4 69.3,27.3 71.4,28.0 73.6,28.0 75.8,26.7 77.9,25.9 80.1,27.5 82.3,31.0 84.4,28.4 86.6,30.2 88.8,28.6 90.9,28.6 93.1,28.7 95.3,28.7 97.5,28.6 99.6,28.5 101.8,25.2 104.0,27.7 106.1,27.0 108.3,26.7 110.5,25.2 112.6,24.4 114.8,22.1 117.0,25.8 119.2,27.4 121.3,26.6 123.5,27.9 125.7,26.4 127.8,24.3 130.0,25.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="25.9" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">高値から20〜30%下落<b>+10</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">24</span>
+      <div>
+        <h2><span class="code">9551</span> メタウォーター</h2>
+        <p class="sector">電気･ガス業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">35<span>/95</span></div>
+      <div class="bar"><i style="width:37%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,080円</b></div><div class="cell"><span>PER</span><b>13.4倍</b></div><div class="cell"><span>PBR</span><b>1.53倍</b></div><div class="cell"><span>配当利回り</span><b>2.60%</b></div><div class="cell"><span>配当性向</span><b>35%</b></div><div class="cell"><span>自己資本比率</span><b>42%</b></div><div class="cell"><span>営業利益率</span><b>6.1%</b></div><div class="cell"><span>高値から</span><b>−14.8%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年12.1%成長<br>
+      レンジ 2,987〜3,210円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,3.5 4.2,3.0 6.3,11.9 8.5,15.5 10.7,14.2 12.8,17.5 15.0,15.5 17.2,15.5 19.4,18.5 21.5,22.9 23.7,18.8 25.9,20.1 28.0,21.6 30.2,23.1 32.4,20.3 34.5,21.8 36.7,25.9 38.9,23.4 41.1,21.3 43.2,20.3 45.4,22.9 47.6,20.6 49.7,28.7 51.9,28.7 54.1,29.2 56.2,27.7 58.4,25.7 60.6,20.1 62.7,15.0 64.9,17.3 67.1,20.6 69.3,22.1 71.4,23.9 73.6,21.8 75.8,20.8 77.9,19.8 80.1,23.6 82.3,31.0 84.4,27.9 86.6,26.4 88.8,25.9 90.9,24.6 93.1,24.9 95.3,24.1 97.5,25.4 99.6,25.7 101.8,23.9 104.0,29.5 106.1,28.7 108.3,23.4 110.5,22.3 112.6,27.2 114.8,26.4 117.0,28.7 119.2,30.7 121.3,29.5 123.5,29.0 125.7,27.2 127.8,25.7 130.0,27.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="27.9" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り2%以上<b>+10</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">25</span>
+      <div>
+        <h2><span class="code">8830</span> 住友不動産</h2>
+        <p class="sector">不動産業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">35<span>/95</span></div>
+      <div class="bar"><i style="width:37%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,186円</b></div><div class="cell"><span>PER</span><b>13.2倍</b></div><div class="cell"><span>PBR</span><b>1.15倍</b></div><div class="cell"><span>配当利回り</span><b>1.63%</b></div><div class="cell"><span>配当性向</span><b>22%</b></div><div class="cell"><span>自己資本比率</span><b>35%</b></div><div class="cell"><span>営業利益率</span><b>28.3%</b></div><div class="cell"><span>高値から</span><b>−19.4%</b></div><div class="cell"><span>レンジ日数</span><b>15日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年6.3%成長<br>
+      レンジ 3,155〜3,417円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,18.4 4.2,15.4 6.3,9.0 8.5,8.9 10.7,11.7 12.8,9.3 15.0,4.8 17.2,4.3 19.4,3.0 21.5,4.8 23.7,6.8 25.9,8.1 28.0,7.9 30.2,6.1 32.4,3.9 34.5,5.6 36.7,8.0 38.9,4.9 41.1,6.9 43.2,10.6 45.4,11.2 47.6,7.3 49.7,9.3 51.9,8.8 54.1,10.3 56.2,14.2 58.4,18.1 60.6,18.8 62.7,17.6 64.9,16.3 67.1,18.0 69.3,21.4 71.4,21.7 73.6,21.5 75.8,22.6 77.9,23.5 80.1,25.2 82.3,26.8 84.4,22.6 86.6,24.3 88.8,22.4 90.9,21.9 93.1,22.0 95.3,22.4 97.5,22.1 99.6,24.8 101.8,22.2 104.0,25.8 106.1,27.5 108.3,28.2 110.5,29.2 112.6,27.9 114.8,25.5 117.0,28.6 119.2,29.2 121.3,28.6 123.5,31.0 125.7,29.9 127.8,27.6 130.0,30.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="30.2" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当利回り1%以上<b>+5</b></span><span class="chip">配当性向20〜50%<b>+10</b></span><span class="chip">PBR1.5倍以下<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">営業利益率15%以上<b>+10</b></span></div>
+</article>
+
+<article class="card">
+  <header>
+    <div class="ident">
+      <span class="rank">26</span>
+      <div>
+        <h2><span class="code">9267</span> Ｇｅｎｋｙ　ＤｒｕｇＳｔｏｒｅｓ</h2>
+        <p class="sector">小売業</p>
+      </div>
+    </div>
+    <div class="score">
+      <div class="score-num">20<span>/95</span></div>
+      <div class="bar"><i style="width:21%"></i></div>
+    </div>
+  </header>
+  <div class="grid"><div class="cell"><span>株価</span><b>3,470円</b></div><div class="cell"><span>PER</span><b>12.9倍</b></div><div class="cell"><span>PBR</span><b>1.73倍</b></div><div class="cell"><span>配当利回り</span><b>0.37%</b></div><div class="cell"><span>配当性向</span><b>5%</b></div><div class="cell"><span>自己資本比率</span><b>42%</b></div><div class="cell"><span>営業利益率</span><b>5.0%</b></div><div class="cell"><span>高値から</span><b>−17.1%</b></div><div class="cell"><span>レンジ日数</span><b>16日</b></div></div>
+  <div class="foot">
+    <div class="note">4期連続 増収増益 ・ 営業利益 年18.0%成長<br>
+      レンジ 3,380〜3,795円</div>
+    <div class="sparkwrap"><svg class="spark" viewBox="0 0 132 34" width="132" height="34" aria-hidden="true"><polyline points="2.0,28.2 4.2,30.4 6.3,27.6 8.5,28.2 10.7,31.0 12.8,28.9 15.0,26.8 17.2,21.6 19.4,15.6 21.5,11.4 23.7,14.3 25.9,15.8 28.0,14.2 30.2,14.3 32.4,16.6 34.5,16.4 36.7,15.5 38.9,16.1 41.1,17.9 43.2,16.6 45.4,15.1 47.6,10.3 49.7,7.5 51.9,3.0 54.1,15.5 56.2,16.6 58.4,17.2 60.6,20.5 62.7,21.6 64.9,20.2 67.1,20.6 69.3,25.0 71.4,21.3 73.6,22.4 75.8,21.3 77.9,23.2 80.1,21.1 82.3,20.0 84.4,17.9 86.6,16.4 88.8,18.4 90.9,17.7 93.1,20.0 95.3,18.5 97.5,17.6 99.6,19.0 101.8,23.2 104.0,21.8 106.1,22.6 108.3,18.9 110.5,21.1 112.6,21.6 114.8,23.9 117.0,25.5 119.2,26.0 121.3,26.0 123.5,25.3 125.7,26.1 127.8,23.9 130.0,25.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="130.0" cy="25.2" r="2.6" fill="currentColor"/></svg><span>直近3か月</span></div>
+  </div>
+  <div class="chips"><span class="chip">配当性向20%未満<b>+5</b></span><span class="chip">高値から10〜20%下落<b>+5</b></span><span class="chip">自己資本比率40%以上<b>+5</b></span><span class="chip">営業利益 年10%成長<b>+5</b></span></div>
+</article>
+  </div>
+
+  <details class="about">
+    <summary>条件と配点について</summary>
+    <table>
+      <tr><th>必須条件</th><th>内容</th></tr>
+      <tr><td>業績</td><td>直近4期連続で増収かつ増益</td></tr><tr><td>PER</td><td>15.0倍以下（会社予想EPS基準）</td></tr><tr><td>下落</td><td>直近60営業日の高値から10.0%以上下落</td></tr><tr><td>レンジ</td><td>直近20営業日の値幅が平均株価の12.0%以内、かつ高値を更新していない</td></tr><tr><td>流動性</td><td>平均売買代金 30,000,000円以上</td></tr>
+    </table>
+    <table>
+      <tr><th>各条件を単独で満たした銘柄数</th><th></th></tr>
+      <tr><td>業績（連続増収増益）</td><td>455 銘柄</td></tr><tr><td>PER15倍以下</td><td>1,741 銘柄</td></tr><tr><td>高値から下落</td><td>1,100 銘柄</td></tr><tr><td>レンジ形成</td><td>1,191 銘柄</td></tr><tr><td>売買代金</td><td>2,067 銘柄</td></tr>
+    </table>
+  </details>
+
+  <footer>
+    このページは自動生成です。数値はJPX公式のJ-Quants APIと、日中は遅延株価をもとに機械的に計算しています。<br>
+    決算の実数値・会社予想は必ずご自身で確認してください。投資判断の責任は利用者にあります。
+  </footer>
+</div>
+</body>
+</html>
