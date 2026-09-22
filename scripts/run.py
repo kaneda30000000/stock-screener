@@ -531,6 +531,8 @@ def _row(r, rank, smax):
     streak = int(r.get("growth_streak") or 0)
     dy = int(r.get("div_years") or 0)
     tag = '<span class="tag">急落</span>' if bool(r.get("alert")) else ""
+    attrs.append(f'data-r-chg1="{_raw(r.get("chg_1d"))}"')
+    attrs.append(f'data-r-chg3="{_raw(r.get("chg_3d"))}"')
 
     return f"""<tr {' '.join(attrs)}>
 <th class="name" scope="row"><div class="nb"><span class="rank">{rank}</span>
@@ -543,6 +545,17 @@ def _row(r, rank, smax):
 <td class="note">{streak}期連続<br>増収増益<br>配当{dy}期</td>
 <td class="sp">{_sparkline(r.get("spark"))}</td>
 </tr>"""
+
+
+def _raw(v):
+    """昇順で並べるときの値。欠損は必ず最後に来るようにする。"""
+    try:
+        f = float(v)
+        if math.isnan(f) or math.isinf(f):
+            raise ValueError
+        return f"{f:.6f}"
+    except (TypeError, ValueError):
+        return "1e18"
 
 
 def _chg_cls(v):
@@ -622,6 +635,7 @@ thead th{position:sticky;top:0;z-index:3;background:var(--surface);
 thead th.s{cursor:pointer;user-select:none}
 thead th.s:hover{color:var(--accent)}
 thead th.s::after{content:"⌄";opacity:.35;margin-left:3px;font-size:10px}
+thead th.s.up::after{content:"⌃"}
 thead th.s.on{color:var(--accent)}
 thead th.s.on::after{opacity:1}
 th.name,thead th.name{position:sticky;left:0;z-index:4;background:var(--surface);
@@ -690,8 +704,11 @@ JS = """
   var tb=tbl.querySelector('tbody'); if(!tb) return;
   var heads=tbl.querySelectorAll('thead th.s');
   function sort(key,th){
+    var asc=th&&th.getAttribute('data-mode')==='asc';
     var rows=Array.prototype.slice.call(tb.querySelectorAll('tr'));
-    rows.sort(function(a,b){
+    rows.sort(asc?function(a,b){
+      return (+a.getAttribute('data-r-'+key))-(+b.getAttribute('data-r-'+key));
+    }:function(a,b){
       var pa=+a.getAttribute('data-s-'+key), pb=+b.getAttribute('data-s-'+key);
       if(pb!==pa) return pb-pa;
       var va=+a.getAttribute('data-v-'+key), vb=+b.getAttribute('data-v-'+key);
@@ -725,7 +742,8 @@ def render_page(passed, allrows, cfg, meta, out_path):
              '<th class="s on" data-key="score" scope="col">合計<br>/' + str(smax) + '</th>']
     for key, _col, label, _u, _d, _h in METRIC_INFO:
         heads.append(f'<th class="s" data-key="{key}" scope="col">{label}</th>')
-    heads += ['<th scope="col">前日比</th>', '<th scope="col">3営業日</th>',
+    heads += ['<th class="s up" data-key="chg1" data-mode="asc" scope="col">前日比</th>',
+              '<th class="s up" data-key="chg3" data-mode="asc" scope="col">3営業日</th>',
               '<th scope="col">株価</th>', '<th scope="col">業績</th>',
               '<th scope="col">3か月</th>']
 
@@ -780,7 +798,7 @@ def render_page(passed, allrows, cfg, meta, out_path):
     <div class="stat"><span>最高点</span><b>{int(passed['score'].max()) if len(passed) else 0}</b></div>
   </div>
 {alert_block}
-  <p class="hint">項目名をタップすると、その項目の点数が高い順に並べ替わります（同点のときは中身の良いほうが上）。横にスクロールできます。</p>
+  <p class="hint">項目名をタップすると並べ替わります。⌄の付いた項目は点数の高い順（同点なら中身の良いほうが上）、⌃の付いた「前日比」「3営業日」は下げの大きい順です。横にスクロールできます。</p>
 
 {table}
 
