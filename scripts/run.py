@@ -359,11 +359,15 @@ def build_technicals(prices: pd.DataFrame, req: dict) -> pd.DataFrame:
                 break
 
         recent_high = np.nanmax(high[-win:])
+        prev1 = float(close[-2]) if len(close) >= 2 else np.nan
+        prev3 = float(close[-4]) if len(close) >= 4 else np.nan
         rows.append({
             "code": code,
             "date": g["Date"].iloc[-1],
             "price": raw_close[-1] if not np.isnan(raw_close[-1]) else last_adj,
             "adj_price": last_adj,
+            "prev1": prev1,
+            "prev3": prev3,
             "high_n": high_n,
             "drawdown": dd,
             "range_width": float(width.iloc[-1]) if not np.isnan(width.iloc[-1]) else np.nan,
@@ -426,6 +430,9 @@ def screen(fund, tech, info, cfg, price_override=None):
     df["pbr"] = df["price"] / df["bps"]
     df["div_yield"] = df["dps"] / df["price"] * 100
     df["payout"] = df["dps"] / df["eps"] * 100
+    # 前日比と直近3営業日の騰落率（株価は分割調整済みで比較）
+    df["chg_1d"] = (df["adj_price"] / df["prev1"] - 1) * 100
+    df["chg_3d"] = (df["adj_price"] / df["prev3"] - 1) * 100
 
     c_growth = df["growth_streak"] >= int(req["consecutive_growth_years"])
     c_per = df["per"].between(float(req["per_min"]) + 1e-9, float(req["per_max"]))
@@ -451,6 +458,13 @@ def screen(fund, tech, info, cfg, price_override=None):
     passed["score_max"] = sum(
         max((r["points"] for r in rules), default=0) for rules in sc.values()
     )
+
+    # 急落の印（前日比、または直近3営業日の下げ）
+    al = cfg.get("alerts", {})
+    d1 = float(al.get("drop_1d_pct", -10.0))
+    d3 = float(al.get("drop_3d_pct", -15.0))
+    passed["alert"] = (passed["chg_1d"] <= d1) | (passed["chg_3d"] <= d3)
+
     passed = passed.sort_values(["score", "per"], ascending=[False, True])
     return passed, df
 
@@ -516,16 +530,61 @@ def _row(r, rank, smax):
     pct = max(3, min(100, round(score / smax * 100))) if smax else 0
     streak = int(r.get("growth_streak") or 0)
     dy = int(r.get("div_years") or 0)
+    tag = '<span class="tag">急落</span>' if bool(r.get("alert")) else ""
 
     return f"""<tr {' '.join(attrs)}>
-<th class="name" scope="row"><span class="rank">{rank}</span>
-  <span class="ident"><b>{name}</b><small>{code} ・ {sector}</small></span></th>
+<th class="name" scope="row"><div class="nb"><span class="rank">{rank}</span>
+  <span class="ident"><b>{name}{tag}</b><small>{code} ・ {sector}</small></span></div></th>
 <td class="total"><b>{score}</b><span class="track"><i style="width:{pct}%"></i></span></td>
 {''.join(cells)}
+<td class="{_chg_cls(r.get('chg_1d'))}">{_f(r.get("chg_1d"), 1, "%")}</td>
+<td class="{_chg_cls(r.get('chg_3d'))}">{_f(r.get("chg_3d"), 1, "%")}</td>
 <td class="px">{_f(r.get("price"), 0, "円")}</td>
 <td class="note">{streak}期連続<br>増収増益<br>配当{dy}期</td>
 <td class="sp">{_sparkline(r.get("spark"))}</td>
 </tr>"""
+
+
+def _chg_cls(v):
+    try:
+        return "chg down" if float(v) < 0 else "chg"
+    except (TypeError, ValueError):
+        return "chg"
+
+
+def _alert_block(passed, smax):
+    """急落した銘柄だけを一覧の上に別枠で出す。"""
+    if "alert" not in passed.columns:
+        return ""
+    hit = passed[passed["alert"].fillna(False)]
+    if not len(hit):
+        return ""
+    hit = hit.sort_values("chg_1d")
+    rows = ""
+    for code, r in hit.iterrows():
+        rows += (
+            f'<tr><th scope="row"><b>{html.escape(str(r.get("name") or ""))}</b>'
+            f'<small>{html.escape(str(code))} ・ {html.escape(str(r.get("sector") or ""))}</small></th>'
+            f'<td class="chg down">{_f(r.get("chg_1d"), 1, "%")}</td>'
+            f'<td class="chg down">{_f(r.get("chg_3d"), 1, "%")}</td>'
+            f'<td>{_f(r.get("per"), 1, "倍")}</td>'
+            f'<td>{_f(r.get("div_yield"), 2, "%")}</td>'
+            f'<td>{_f(r.get("price"), 0, "円")}</td>'
+            f'<td class="sc">{int(r.get("score") or 0)}<span>/{smax}</span></td></tr>'
+        )
+    return f"""
+  <section class="alert">
+    <h2><span class="mark" aria-hidden="true">▼</span> 急落中 <em>{len(hit)}銘柄</em></h2>
+    <p>条件を通った銘柄のうち、前日比−10%以下、または直近3営業日で−15%以下のもの。下の一覧にも同じ銘柄が入っています。</p>
+    <div class="scroll">
+      <table class="al">
+        <thead><tr><th scope="col">銘柄</th><th scope="col">前日比</th>
+        <th scope="col">3営業日</th><th scope="col">PER</th>
+        <th scope="col">配当利回り</th><th scope="col">株価</th><th scope="col">合計点</th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </div>
+  </section>"""
 
 
 CSS = """
@@ -533,11 +592,13 @@ CSS = """
   --bg:#f6f7f9; --surface:#fff; --line:#e3e6ea; --line2:#eef0f3;
   --ink:#16191d; --ink2:#5a616b; --ink3:#8a919c;
   --accent:#1f6feb; --accent-soft:#e8f0fe;
+  --warn:#b4341c; --warn-soft:#fdeeea; --warn-line:#f2c4b8;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f1216; --surface:#171b21; --line:#282e37; --line2:#1f242b;
   --ink:#e9edf2; --ink2:#a3acb9; --ink3:#767f8c;
   --accent:#5a9bff; --accent-soft:#1b2940;
+  --warn:#ff8a6b; --warn-soft:#2a1a16; --warn-line:#4a2a20;
 }}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -566,7 +627,8 @@ thead th.s.on::after{opacity:1}
 th.name,thead th.name{position:sticky;left:0;z-index:4;background:var(--surface);
   text-align:left;min-width:196px;max-width:196px;white-space:normal;
   border-right:1px solid var(--line)}
-tbody th.name{z-index:2;font-weight:400;display:flex;gap:7px;align-items:flex-start}
+tbody th.name{z-index:2;font-weight:400}
+.nb{display:flex;gap:7px;align-items:flex-start}
 .rank{flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:6px;
   background:var(--accent-soft);color:var(--accent);font-size:10.5px;font-weight:700;
   margin-top:2px}
@@ -588,6 +650,27 @@ td.m .val{display:block;font-size:13px}
 td.m .pt{display:block;font-size:10.5px;color:var(--ink3)}
 td.m.has .pt{color:var(--accent);font-weight:700}
 td.px{color:var(--ink2)}
+td.chg{min-width:62px;color:var(--ink2)}
+td.chg.down{color:var(--warn);font-weight:600}
+.tag{display:inline-block;margin-left:5px;padding:0 5px;border-radius:4px;
+  background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-line);
+  font-size:9.5px;font-weight:700;vertical-align:1px}
+.alert{background:var(--warn-soft);border:1px solid var(--warn-line);
+  border-radius:12px;padding:12px 12px 4px;margin:0 0 14px}
+.alert h2{font-size:14px;margin:0 0 3px;color:var(--warn)}
+.alert h2 em{font-style:normal;font-weight:600;font-size:12px}
+.alert .mark{font-size:11px}
+.alert p{margin:0 0 9px;font-size:11.5px;color:var(--ink2)}
+.alert .scroll{border-color:var(--warn-line)}
+table.al th[scope="row"],table.al thead th:first-child{position:sticky;left:0;z-index:3;
+  background:var(--warn-soft);text-align:left;white-space:normal;
+  min-width:150px;max-width:150px;border-right:1px solid var(--warn-line)}
+table.al thead th{background:var(--warn-soft)}
+table.al thead th:first-child{z-index:6}
+table.al th,table.al td{border-bottom:1px solid var(--warn-line)}
+table.al th[scope="row"] b{display:block;font-size:13px;font-weight:600}
+table.al th[scope="row"] small{display:block;font-size:10.5px;color:var(--ink3)}
+table.al td.sc span{font-size:10px;color:var(--ink3)}
 td.note{font-size:10px;color:var(--ink3);line-height:1.35;text-align:left}
 td.sp{color:var(--accent);padding-right:12px}
 tbody tr:hover th.name,tbody tr:hover td{background:var(--line2)}
@@ -603,8 +686,9 @@ footer{margin-top:22px;font-size:11px;color:var(--ink3);line-height:1.7}
 
 JS = """
 (function(){
-  var tb=document.querySelector('tbody'); if(!tb) return;
-  var heads=document.querySelectorAll('thead th.s');
+  var tbl=document.getElementById('main'); if(!tbl) return;
+  var tb=tbl.querySelector('tbody'); if(!tb) return;
+  var heads=tbl.querySelectorAll('thead th.s');
   function sort(key,th){
     var rows=Array.prototype.slice.call(tb.querySelectorAll('tr'));
     rows.sort(function(a,b){
@@ -641,7 +725,8 @@ def render_page(passed, allrows, cfg, meta, out_path):
              '<th class="s on" data-key="score" scope="col">合計<br>/' + str(smax) + '</th>']
     for key, _col, label, _u, _d, _h in METRIC_INFO:
         heads.append(f'<th class="s" data-key="{key}" scope="col">{label}</th>')
-    heads += ['<th scope="col">株価</th>', '<th scope="col">業績</th>',
+    heads += ['<th scope="col">前日比</th>', '<th scope="col">3営業日</th>',
+              '<th scope="col">株価</th>', '<th scope="col">業績</th>',
               '<th scope="col">3か月</th>']
 
     body = "\n".join(_row(r, i + 1, smax) for i, (_, r) in enumerate(rows.iterrows()))
@@ -649,8 +734,10 @@ def render_page(passed, allrows, cfg, meta, out_path):
         table = ('<div class="empty">今日は必須条件をすべて満たす銘柄がありませんでした。'
                  '<br>条件をゆるめたい場合は config.yml の数字を調整してください。</div>')
     else:
-        table = ('<div class="scroll"><table><thead><tr>' + "".join(heads)
+        table = ('<div class="scroll"><table id="main"><thead><tr>' + "".join(heads)
                  + '</tr></thead><tbody>' + body + '</tbody></table></div>')
+
+    alert_block = _alert_block(passed, smax)
 
     req = cfg["required"]
     tech = cfg.get("technical", {})
@@ -692,6 +779,7 @@ def render_page(passed, allrows, cfg, meta, out_path):
     <div class="stat"><span>表示</span><b>{len(rows):,}</b></div>
     <div class="stat"><span>最高点</span><b>{int(passed['score'].max()) if len(passed) else 0}</b></div>
   </div>
+{alert_block}
   <p class="hint">項目名をタップすると、その項目の点数が高い順に並べ替わります（同点のときは中身の良いほうが上）。横にスクロールできます。</p>
 
 {table}
