@@ -1,0 +1,87 @@
+name: スクリーニング
+
+on:
+  schedule:
+    - cron: "0 17 * * 0-4"
+    - cron: "35 2 * * 1-5"
+    - cron: "0 7 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "full = 全銘柄を調べ直す / intraday = 株価だけ更新"
+        default: "full"
+        type: choice
+        options: ["full", "intraday"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: screener
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 実行モードを決める
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ inputs.mode }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 17 * * 0-4" ]; then
+            echo "mode=full" >> $GITHUB_OUTPUT
+          else
+            echo "mode=intraday" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: 貯めたデータを取り出す
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: jq-store-${{ github.run_id }}
+          restore-keys: |
+            jq-store-
+
+      - name: スクリーニングを実行
+        env:
+          JQ_MAIL: ${{ secrets.JQ_MAIL }}
+          JQ_PASSWORD: ${{ secrets.JQ_PASSWORD }}
+          CACHE_DIR: cache
+        run: python scripts/run.py ${{ steps.mode.outputs.mode }}
+
+      - name: 結果をリポジトリに保存
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs data
+          git diff --staged --quiet || git commit -m "更新: $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M') (${{ steps.mode.outputs.mode }})"
+          git pull --rebase --autostash || true
+          git push
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: screen
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
