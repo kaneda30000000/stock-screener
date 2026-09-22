@@ -26,8 +26,17 @@ jobs:
   screen:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      JQ_API_KEY: ${{ secrets.JQ_API_KEY }}
+      JQ_PASSWORD: ${{ secrets.JQ_PASSWORD }}
+      CACHE_DIR: cache
     steps:
       - uses: actions/checkout@v4
+
+      - name: 設定の確認
+        run: |
+          echo "JQ_API_KEY の文字数: ${#JQ_API_KEY}"
+          echo "JQ_PASSWORD の文字数: ${#JQ_PASSWORD}"
 
       - name: 実行モードを決める
         id: mode
@@ -56,9 +65,6 @@ jobs:
             jq-store-
 
       - name: スクリーニングを実行
-        env:
-          JQ_API_KEY: ${{ secrets.JQ_API_KEY }}
-          CACHE_DIR: cache
         run: python scripts/run.py ${{ steps.mode.outputs.mode }}
 
       - name: 結果をリポジトリに保存
