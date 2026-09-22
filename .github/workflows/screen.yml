@@ -25,18 +25,13 @@ concurrency:
 jobs:
   screen:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     env:
       JQ_API_KEY: ${{ secrets.JQ_API_KEY }}
       JQ_PASSWORD: ${{ secrets.JQ_PASSWORD }}
       CACHE_DIR: cache
     steps:
       - uses: actions/checkout@v4
-
-      - name: 設定の確認
-        run: |
-          echo "JQ_API_KEY の文字数: ${#JQ_API_KEY}"
-          echo "JQ_PASSWORD の文字数: ${#JQ_PASSWORD}"
 
       - name: 実行モードを決める
         id: mode
@@ -57,7 +52,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: 貯めたデータを取り出す
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: cache
           key: jq-store-${{ github.run_id }}
@@ -66,6 +61,13 @@ jobs:
 
       - name: スクリーニングを実行
         run: python scripts/run.py ${{ steps.mode.outputs.mode }}
+
+      - name: 貯めたデータを保存（失敗しても残す）
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache
+          key: jq-store-${{ github.run_id }}
 
       - name: 結果をリポジトリに保存
         run: |
