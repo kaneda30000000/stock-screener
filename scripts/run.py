@@ -1,4 +1,4 @@
-"""買い時スクリーニング — これ1ファイルで全部動きます。
+"""株の自動まとめ — これ1ファイルで全部動きます。
 
   python scripts/run.py full      … 全銘柄を一から調べ直す（深夜に1回）
   python scripts/run.py intraday  … 候補の株価だけ更新する（前場引け後と大引け後）
@@ -799,7 +799,10 @@ td.total i{display:block;height:100%;border-radius:2px;background:var(--accent)}
    こうすると横スクロールのバーが常に画面内に出る。 */
 @media(min-width:760px){
   .wrap{height:100dvh;display:flex;flex-direction:column;padding-bottom:10px}
-  h1,.sub,.stats,.hint,.alert,details.about,footer{flex:none}
+  .tabs{flex:none}
+  .panel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  #panel-brief{overflow:auto;padding-right:2px}
+  #panel-screen > *{flex:none}
   .alert{margin-bottom:10px}
   .alert .scroll{max-height:24vh}
   .scroll.main{flex:1 1 auto;min-height:240px}
@@ -895,6 +898,323 @@ JS = """
 """
 
 
+BRIEF_CSS = """
+/* ---------- タブ ---------- */
+.tabs{display:flex;gap:6px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.tab{
+  appearance:none;background:none;border:0;border-bottom:2px solid transparent;
+  font:inherit;font-size:14px;font-weight:600;color:var(--ink3);
+  padding:8px 14px 9px;cursor:pointer;margin-bottom:-1px;white-space:nowrap;
+}
+.tab:hover{color:var(--ink2)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+.panel[hidden]{display:none}
+
+/* ---------- 朝のブリーフ ---------- */
+.bhead{margin-bottom:12px}
+.brow{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.stamp{font-size:15px;font-weight:700;color:var(--accent);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.bmeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:7px}
+.chip{font-size:11px;padding:3px 9px;border-radius:999px;white-space:nowrap;
+  border:1px solid var(--line);color:var(--ink2);background:var(--surface);
+  font-variant-numeric:tabular-nums}
+.chip.ok{color:#17788c;border-color:#17788c66}
+.chip.warn{color:var(--warn);background:var(--warn-soft);border-color:var(--warn-line)}
+select.picker{font:inherit;font-size:16px;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:36px}
+.bbody{max-width:760px}
+.state{margin-top:8px;padding:22px 18px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;color:var(--ink2);font-size:14.5px;line-height:1.85}
+.state strong{display:block;color:var(--ink);font-size:15.5px;margin-bottom:7px}
+.snap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.band{font-size:11px;letter-spacing:.16em;font-weight:700;color:var(--ink3);
+  background:var(--bg);padding:7px 15px;border-block:1px solid var(--line)}
+.band:first-child{border-top:0}
+.snap .row{padding:11px 15px;border-bottom:1px solid var(--line2)}
+.snap .row:last-child{border-bottom:0}
+.r-top{display:flex;align-items:baseline;gap:4px 8px;flex-wrap:wrap}
+.lab{flex:1 1 auto;min-width:0;font-size:14px;font-weight:500;color:var(--ink);
+  overflow-wrap:break-word}
+.lab .n{font-size:11px;color:var(--ink3);font-weight:700;margin-right:7px;
+  font-variant-numeric:tabular-nums}
+.asof{margin-left:auto;font-size:11.5px;color:var(--ink3);white-space:nowrap}
+.r-bot{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:3px}
+.snap .val{font-size:20px;font-weight:700;color:var(--ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.snap .chg{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+/* 日本式：上げは赤、下げは青 */
+.snap .chg.up{color:#c4342a}
+.snap .chg.down{color:#17788c}
+.snap .chg.flat{color:var(--ink3)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .snap .chg.up{color:#f0705f}
+  :root:not([data-theme="light"]) .snap .chg.down{color:#4cbad0}}
+.snap .row.bad .val{color:var(--warn)}
+.gauge{padding:0 15px 12px;margin-top:-3px}
+.gauge .track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.gauge .track i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.gauge .ends{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-top:3px}
+.btools{display:flex;justify-content:flex-end;margin-top:16px}
+.btools button{font:inherit;font-size:13px;color:var(--ink2);background:none;
+  border:1px solid var(--line);border-radius:999px;padding:7px 15px;cursor:pointer}
+details.sec{margin-top:9px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden}
+details.sec > summary{list-style:none;cursor:pointer;padding:14px 15px;
+  display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;color:var(--ink)}
+details.sec > summary::-webkit-details-marker{display:none}
+.caret{flex:0 0 auto;width:8px;height:8px;border-right:2px solid var(--accent);
+  border-bottom:2px solid var(--accent);transform:rotate(45deg);transition:transform .18s}
+details[open] > summary .caret{transform:rotate(-135deg)}
+.sec-body{padding:13px 15px 17px;border-top:1px solid var(--line)}
+.prose{color:var(--ink2);font-size:15px;line-height:1.9}
+.prose h3{font-size:12.5px;font-weight:700;margin:20px 0 8px;color:var(--accent);letter-spacing:.05em}
+.prose h3:first-child{margin-top:0}
+.prose p{margin:0 0 13px;overflow-wrap:anywhere}
+.prose p.head{font-weight:700;color:var(--ink);margin:18px 0 6px}
+.prose p.head:first-child{margin-top:0}
+.prose p.impact{color:var(--ink3);font-size:14px;background:var(--bg);
+  border-left:3px solid var(--line);border-radius:0 8px 8px 0;padding:10px 12px;margin:0 0 16px}
+.prose ul{margin:0 0 13px;padding-left:1.2em}
+.prose li{margin-bottom:6px}
+.prose a{color:var(--accent);text-underline-offset:3px}
+.prose .listing{background:var(--bg);border-radius:10px;padding:5px 3px;margin:0 0 16px}
+.prose .listing div{padding:9px 11px;font-size:14.5px;border-bottom:1px solid var(--line)}
+.prose .listing div:last-child{border-bottom:0}
+.bsources{margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+.bsources .t{font-size:11px;letter-spacing:.14em;color:var(--ink3);font-weight:700;margin-bottom:7px}
+.bsources ul{list-style:none;padding:0;margin:0;font-size:14px}
+.bsources a{color:var(--ink2);text-decoration:none;display:inline-block;padding:5px 0}
+.bfoot{margin-top:20px;font-size:12px;color:var(--ink3);line-height:1.8;padding-bottom:20px}
+@media(max-width:560px){
+  .tab{padding:8px 10px 9px;font-size:13px}
+  .prose{font-size:14.5px}
+}
+"""
+
+
+BRIEF_JS = r"""
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+  /* ---------- タブ ---------- */
+  var tabs=document.querySelectorAll(".tab");
+  function showTab(name){
+    tabs.forEach(function(b){b.classList.toggle("on",b.dataset.tab===name);});
+    var b=$("panel-brief"), s=$("panel-screen");
+    if(b) b.hidden = name!=="brief";
+    if(s) s.hidden = name!=="screen";
+    try{localStorage.setItem("tab",name);}catch(e){}
+    if(location.hash!=="#"+name){ try{history.replaceState(null,"","#"+name);}catch(e){} }
+    if(name==="brief") loadBrief();
+  }
+  tabs.forEach(function(b){b.addEventListener("click",function(){showTab(b.dataset.tab);});});
+
+  var want=(location.hash||"").replace("#","");
+  if(want!=="brief"&&want!=="screen"){
+    try{want=localStorage.getItem("tab")||"";}catch(e){want="";}
+  }
+  if(want!=="brief"&&want!=="screen"){
+    var hh=new Date(Date.now()+(new Date().getTimezoneOffset()+540)*60000).getHours();
+    want = hh<12 ? "brief" : "screen";
+  }
+  showTab(want);
+
+  /* ---------- かんたんなMarkdown ---------- */
+  function inline(s){
+    s=esc(s);
+    s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+    s=s.replace(/`([^`]+)`/g,"<code>$1</code>");
+    return s;
+  }
+  function md(src){
+    if(!src) return "";
+    var lines=String(src).split(/\r?\n/),out=[],list=null,box=false;
+    function cl(){if(list){out.push("</"+list+">");list=null;}}
+    function cb(){if(box){out.push("</div>");box=false;}}
+    for(var i=0;i<lines.length;i++){
+      var t=lines[i].trim();
+      if(!t){cl();cb();continue;}
+      if(/^###\s/.test(t)){cl();cb();out.push("<h3>"+inline(t.replace(/^###\s*/,""))+"</h3>");continue;}
+      if(/^##\s/.test(t)){cl();cb();out.push("<h3>"+inline(t.replace(/^##\s*/,"").replace(/^■\s*/,""))+"</h3>");continue;}
+      if(/^〈.+〉$/.test(t)){cl();cb();out.push("<h3>"+inline(t)+"</h3>");out.push('<div class="listing">');box=true;continue;}
+      if(box){
+        if(/^\d+\./.test(t)){out.push("<div>"+inline(t)+"</div>");continue;}
+        if(/^[-*・]\s*/.test(t)){out.push("<div>"+inline(t.replace(/^[-*・]\s*/,""))+"</div>");continue;}
+        cb();
+      }
+      if(/^[-*]\s+/.test(t)){cb();
+        if(list!=="ul"){cl();out.push("<ul>");list="ul";}
+        out.push("<li>"+inline(t.replace(/^[-*]\s+/,""))+"</li>");continue;}
+      cl();
+      if(/^\*\*.+\*\*$/.test(t)){out.push('<p class="head">'+inline(t)+"</p>");continue;}
+      if(/^(影響|補足)[：:]/.test(t)){out.push('<p class="impact">'+inline(t)+"</p>");continue;}
+      out.push("<p>"+inline(t)+"</p>");
+    }
+    cl();cb();
+    return out.join("");
+  }
+  function sections(src){
+    if(!src) return [];
+    var lines=String(src).split(/\r?\n/),secs=[],cur=null;
+    for(var i=0;i<lines.length;i++){
+      var t=lines[i];
+      if(/^##\s+/.test(t.trim())){
+        if(cur) secs.push(cur);
+        cur={title:t.trim().replace(/^##\s*/,"").replace(/^■\s*/,"").trim(),lines:[]};
+      } else if(cur){cur.lines.push(t);}
+      else if(t.trim()){cur={title:"",lines:[t]};}
+    }
+    if(cur) secs.push(cur);
+    return secs.map(function(s){return {title:s.title,body:s.lines.join("\n").trim()};})
+               .filter(function(s){return s.title||s.body;});
+  }
+  function opensBy(t){return /押さえ|注目予定|スナップショット|取得に失敗|保存/.test(t||"");}
+
+  /* ---------- スナップショット ---------- */
+  function dir(c){
+    var s=String(c||"");
+    if(/▼/.test(s)) return "down";
+    if(/▲/.test(s)) return "up";
+    if(/[-−]\s*\d/.test(s)&&!/\+/.test(s)) return "down";
+    if(/\+/.test(s)) return "up";
+    return "flat";
+  }
+  function arrow(d){return d==="up"?"▲":d==="down"?"▼":"—";}
+  function trimChange(c){return String(c||"").replace(/^(前営業日終値比|前営業日比|前日終値比|前日比)\s*/,"");}
+  function splitVal(v){
+    var m=String(v||"").match(/^(.*?)（(.+)）\s*$/);
+    return m?{main:m[1],asof:m[2]}:{main:String(v||""),asof:""};
+  }
+  var BANDS={1:"日本株",5:"米国株",7:"為替・金利",10:"半導体・商品",12:"市場心理"};
+  function snapshot(items){
+    var h='<div class="snap">';
+    items.forEach(function(it,i){
+      var n=i+1;
+      if(BANDS[n]) h+='<div class="band">'+esc(BANDS[n])+"</div>";
+      var sv=splitVal(it.value),d=dir(it.change),ok=it.ok!==false;
+      h+='<div class="row'+(ok?"":" bad")+'"><div class="r-top">'
+       + '<span class="lab"><span class="n">'+n+"</span>"+esc(it.label)+"</span>"
+       + (sv.asof?'<span class="asof">'+esc(sv.asof)+"</span>":"")
+       + '</div><div class="r-bot"><span class="val">'+esc(sv.main)+"</span>"
+       + '<span class="chg '+d+'">'+arrow(d)+" "+esc(trimChange(it.change))+"</span></div></div>";
+      if(/Fear|Greed/i.test(String(it.label)+String(it.change))){
+        var v=parseFloat(String(it.value).replace(/[^\d.]/g,""));
+        if(isFinite(v)){
+          h+='<div class="gauge"><div class="track"><i style="width:'+Math.max(2,Math.min(100,v))+'%"></i></div>'
+           + '<div class="ends"><span>0 極度の恐怖</span><span>100 極度の強気</span></div></div>';
+        }
+      }
+    });
+    return h+"</div>";
+  }
+
+  /* ---------- 描画 ---------- */
+  var DATES=[],CACHE={},LOADED=false;
+  function empty(msg,detail){
+    $("b-main").innerHTML='<div class="state"><strong>'+esc(msg)+"</strong>"+detail+"</div>";
+  }
+  function render(doc){
+    $("b-stamp").textContent=doc.date||"";
+    var m=[];
+    if(doc.period) m.push('<span class="chip">'+esc(doc.period)+"</span>");
+    if(doc.ok_count!=null&&doc.total!=null){
+      m.push('<span class="chip '+(doc.ok_count===doc.total?"ok":"warn")+'">指標 '+doc.ok_count+"/"+doc.total+"</span>");
+    }
+    if(DATES.length>1){
+      m.push('<select class="picker" id="b-pick" aria-label="日付を選ぶ">'
+        +DATES.map(function(d){return '<option value="'+esc(d)+'"'+(d===doc.date?" selected":"")+">"+esc(d)+"</option>";}).join("")
+        +"</select>");
+    }
+    $("b-meta").innerHTML=m.join("");
+    var pick=$("b-pick");
+    if(pick) pick.addEventListener("change",function(){show(pick.value);});
+
+    var h="";
+    if(doc.snapshot_items&&doc.snapshot_items.length) h+=snapshot(doc.snapshot_items);
+    var stream=[doc.note,doc.lead,doc.markdown]
+      .concat((doc.parts||[]).map(function(p){return typeof p==="string"?p:(p&&p.markdown);}))
+      .concat([doc.outlook])
+      .filter(function(x){return x&&String(x).trim();}).join("\n\n");
+    var secs=sections(stream);
+    if(secs.length){
+      h+='<div class="btools"><button type="button" id="b-toggle">すべて開く</button></div>';
+      secs.forEach(function(s){
+        h+='<details class="sec"'+(opensBy(s.title)?" open":"")+">"
+         + '<summary><span class="caret"></span><span>'+esc(s.title||"本文")+"</span></summary>"
+         + '<div class="sec-body"><div class="prose">'+md(s.body)+"</div></div></details>";
+      });
+    }
+    if(doc.sources_markdown){
+      var links=[];
+      String(doc.sources_markdown).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,function(_,tt,u){
+        links.push('<li><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(tt)+"</a></li>");return "";});
+      if(links.length) h+='<div class="bsources"><div class="t">出典</div><ul>'+links.join("")+"</ul></div>";
+    }
+    h+='<div class="bfoot">数値はGitHub Actionsが平日朝に自動取得したもの、本文は定期タスクが保存したものです。</div>';
+    $("b-main").innerHTML=h;
+
+    var btn=$("b-toggle");
+    if(btn) btn.addEventListener("click",function(){
+      var all=$("b-main").querySelectorAll("details.sec");
+      var open=btn.textContent.indexOf("開く")>=0;
+      for(var i=0;i<all.length;i++) all[i].open=open;
+      btn.textContent=open?"すべて閉じる":"すべて開く";
+    });
+  }
+  function show(date){
+    if(CACHE[date]) return render(CACHE[date]);
+    fetch("briefs/"+date+".json",{cache:"no-cache"}).then(function(r){
+      if(!r.ok) throw new Error(r.status); return r.json();
+    }).then(function(d){
+      if(!d.date) d.date=date;
+      CACHE[date]=d; render(d);
+    })["catch"](function(){ empty("その日のブリーフを読めませんでした","日付を選び直してください。"); });
+  }
+  /* 日付一覧のファイルは持たず、ファイルの有無を直接確かめる。
+     こうすると毎朝の書き込みは「その日のJSONを1本置く」だけで済む。 */
+  function jstYmd(back){
+    var t=Date.now()+(new Date().getTimezoneOffset()*60000)+9*3600000-back*86400000;
+    var x=new Date(t), p=function(n){return (n<10?"0":"")+n;};
+    return {s:x.getFullYear()+"-"+p(x.getMonth()+1)+"-"+p(x.getDate()), wd:x.getDay()};
+  }
+  function candidates(){
+    var out=[];
+    for(var i=0;i<60&&out.length<30;i++){
+      var d=jstYmd(i);
+      if(d.wd===0||d.wd===6) continue;
+      out.push(d.s);
+    }
+    return out;
+  }
+  function loadBrief(){
+    if(LOADED) return;
+    LOADED=true;
+    var list=candidates();
+    Promise.all(list.map(function(d){
+      return fetch("briefs/"+d+".json",{method:"HEAD",cache:"no-cache"})
+        .then(function(r){return r.ok?d:null;})["catch"](function(){return null;});
+    })).then(function(res){
+      DATES=res.filter(Boolean).sort().reverse();
+      if(!DATES.length){
+        LOADED=false;
+        empty("まだブリーフが保存されていません",
+          "平日朝の定期タスクが <code>docs/briefs/</code> に最初の1本を置くと、ここに表示されます。");
+        return;
+      }
+      show(DATES[0]);
+    })["catch"](function(){
+      LOADED=false;
+      empty("ブリーフを読み込めませんでした","時間をおいて開き直してください。");
+    });
+  }
+})();
+"""
+
+
 def render_page(passed, allrows, cfg, meta, out_path):
     LINK_TMPL[0] = str(cfg["display"].get("link_url") or "")
     rows = passed.head(int(cfg["display"]["max_rows"]))
@@ -947,11 +1267,27 @@ def render_page(passed, allrows, cfg, meta, out_path):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>買い時スクリーニング</title>
-<style>{CSS}</style>
+<title>株の自動まとめ</title>
+<style>{CSS}{BRIEF_CSS}</style>
 </head>
 <body>
 <div class="wrap">
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab" data-tab="brief" role="tab">朝のブリーフ</button>
+    <button type="button" class="tab" data-tab="screen" role="tab">スクリーニング</button>
+  </nav>
+
+  <section class="panel" id="panel-brief" role="tabpanel" hidden>
+    <header class="bhead">
+      <div class="brow"><h1>朝のマーケット・ブリーフ</h1><span class="stamp" id="b-stamp">—</span></div>
+      <div class="bmeta" id="b-meta"></div>
+    </header>
+    <div class="bbody" id="b-main">
+      <div class="state"><strong>読み込み中</strong>保存済みのブリーフを探しています。</div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-screen" role="tabpanel">
   <h1>買い時スクリーニング</h1>
   <p class="sub">最終更新 {now}（日本時間）・株価基準 {html.escape(str(meta.get('price_date','—')))}{html.escape(meta.get('price_note',''))}</p>
   <div class="stats">
@@ -982,8 +1318,10 @@ def render_page(passed, allrows, cfg, meta, out_path):
     株式分割があった銘柄は、1株あたり配当が見かけ上減って「減配」と判定されることがあります。<br>
     決算の実数値・会社予想は必ずご自身で確認してください。投資判断の責任は利用者にあります。
   </footer>
+  </section>
 </div>
 <script>{JS}</script>
+<script>{BRIEF_JS}</script>
 </body>
 </html>"""
     with open(out_path, "w", encoding="utf-8") as f:
