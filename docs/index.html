@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>買い時スクリーニング</title>
+<title>株の自動まとめ</title>
 <style>
 :root{
   --bg:#f6f7f9; --surface:#fff; --line:#e3e6ea; --line2:#eef0f3;
@@ -68,7 +68,7 @@ td.total i{display:block;height:100%;border-radius:2px;background:var(--accent)}
    こうすると横スクロールのバーが常に画面内に出る。 */
 @media(min-width:760px){
   .wrap{height:100dvh;display:flex;flex-direction:column;padding-bottom:10px}
-  h1,.sub,.stats,.hint,.alert,details.about,footer{flex:none}
+  .tabs,h1,.sub,.stats,.hint,.alert,details.about,footer{flex:none}
   .alert{margin-bottom:10px}
   .alert .scroll{max-height:24vh}
   .scroll.main{flex:1 1 auto;min-height:240px}
@@ -126,12 +126,27 @@ details.about th,details.about td{border-bottom:1px solid var(--line);padding:5p
   text-align:left;font-weight:400;white-space:normal}
 details.about th{color:var(--ink3);font-size:11px}
 footer{margin-top:22px;font-size:11px;color:var(--ink3);line-height:1.7}
+
+.tabs{display:flex;gap:4px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.tab{
+  display:inline-block;border-bottom:2px solid transparent;
+  font-size:14px;font-weight:600;color:var(--ink3);text-decoration:none;
+  padding:8px 14px 9px;margin-bottom:-1px;white-space:nowrap;
+}
+a.tab:hover{color:var(--ink2);background:var(--line2);border-radius:8px 8px 0 0}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .ext{font-size:11px;opacity:.6;margin-left:3px}
+@media(max-width:560px){.tab{padding:8px 10px 9px;font-size:13px}}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <nav class="tabs">
+    <span class="tab on">スクリーニング</span>
+    <a class="tab" href="https://claude.ai/artifact/TyoWrj3u7pDo1YEh7ydYTX">朝のブリーフ<span class="ext">↗</span></a>
+  </nav>
   <h1>買い時スクリーニング</h1>
-  <p class="sub">最終更新 2026-09-23 16:56（日本時間）・株価基準 2026-09-18</p>
+  <p class="sub">最終更新 2026-09-23 23:57（日本時間）・株価基準 2026-09-18</p>
   <div class="stats">
     <div class="stat"><span>調べた銘柄</span><b>3,546</b></div>
     <div class="stat"><span>条件通過</span><b>170</b></div>
