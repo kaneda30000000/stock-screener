@@ -627,7 +627,7 @@ def _row(r, rank, smax):
     short = _short(r.get("name"))
     return f"""<tr {' '.join(attrs)}>
 <th class="name" scope="row" title="{name}"><div class="nb"><span class="rank">{rank}</span>
-  <span class="ident {_name_cls(short)}">{html.escape(short)}{tag}</span></div></th>
+  {_link(r.name, html.escape(short) + tag, "ident " + _name_cls(short))}</div></th>
 <td class="code">{code}</td>
 <td class="sector">{sector}</td>
 <td class="total"><b>{score}</b><span class="track"><i style="width:{pct}%"></i></span></td>
@@ -672,6 +672,18 @@ def _short(name):
     return s.replace("・", "").strip()
 
 
+LINK_TMPL = [""]      # config.yml の display.link_url をここに入れて使う
+
+
+def _link(code, inner, cls=""):
+    """銘柄名をクリックしたら外部サイトに飛ぶようにする。"""
+    if not LINK_TMPL[0]:
+        return f'<span class="{cls}">{inner}</span>' if cls else inner
+    url = html.escape(LINK_TMPL[0].replace("{code}", str(code)), quote=True)
+    c = f' class="lnk {cls}"' if cls else ' class="lnk"'
+    return f'<a href="{url}" target="_blank" rel="noopener noreferrer"{c}>{inner}</a>'
+
+
 def _name_cls(s):
     n = len(s)
     if n >= 13:
@@ -699,8 +711,9 @@ def _alert_block(passed, smax):
     rows = ""
     for code, r in hit.iterrows():
         rows += (
-            f'<tr><th scope="row"><b>{html.escape(str(r.get("name") or ""))}</b>'
-            f'<small>{html.escape(str(code))} ・ {html.escape(str(r.get("sector") or ""))}</small></th>'
+            f'<tr><th scope="row">'
+            + _link(code, "<b>" + html.escape(str(r.get("name") or "")) + "</b>")
+            + f'<small>{html.escape(str(code))} ・ {html.escape(str(r.get("sector") or ""))}</small></th>'
             f'<td class="chg down">{_f(r.get("chg_1d"), 1, "%")}</td>'
             f'<td class="chg down">{_f(r.get("chg_3d"), 1, "%")}</td>'
             f'<td>{_f(r.get("per"), 1, "倍")}</td>'
@@ -772,6 +785,9 @@ tbody th.name{z-index:2;font-weight:400}
   background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:700;
   margin-top:1px}
 .ident{min-width:0;font-weight:600;line-height:1.25;word-break:break-word}
+a.lnk{color:inherit;text-decoration:none;display:inline-block}
+a.lnk:hover,a.lnk:focus-visible{color:var(--accent);text-decoration:underline}
+table.al a.lnk b{font-weight:600}
 .ident.n1{font-size:13px}
 .ident.n2{font-size:11.5px}
 .ident.n3{font-size:10px}
@@ -880,6 +896,7 @@ JS = """
 
 
 def render_page(passed, allrows, cfg, meta, out_path):
+    LINK_TMPL[0] = str(cfg["display"].get("link_url") or "")
     rows = passed.head(int(cfg["display"]["max_rows"]))
     smax = int(passed["score_max"].max()) if len(passed) else 0
 
