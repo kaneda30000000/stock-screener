@@ -40,6 +40,26 @@ scoring:
     - {min: 0.01, max: 14.0, points: 15, label: "PER14倍以下"}
     - {min: 0.01, max: 16.0, points: 10, label: "PER16倍以下"}
 
+  q_sales_yoy:           # 直近四半期の売上（累計）の前年同期比（%）
+    - {min: 20.0, points: 30, label: "四半期 増収20%以上"}
+    - {min: 10.0, points: 20, label: "四半期 増収10%以上"}
+    - {min: 1.0,  points: 10, label: "四半期 増収1%以上"}
+
+  q_op_yoy:              # 直近四半期の営業利益（累計）の前年同期比（%）
+    - {min: 20.0, points: 30, label: "四半期 増益20%以上"}
+    - {min: 10.0, points: 20, label: "四半期 増益10%以上"}
+    - {min: 1.0,  points: 10, label: "四半期 増益1%以上"}
+
+  q_sales_progress:      # 売上の、会社予想に対する進捗率（%）
+    - {min: 120.0, points: 30, label: "売上進捗120%以上"}
+    - {min: 110.0, points: 20, label: "売上進捗110%以上"}
+    - {min: 101.0, points: 10, label: "売上進捗101%以上"}
+
+  q_op_progress:         # 営業利益の、会社予想に対する進捗率（%）
+    - {min: 120.0, points: 30, label: "利益進捗120%以上"}
+    - {min: 110.0, points: 20, label: "利益進捗110%以上"}
+    - {min: 101.0, points: 10, label: "利益進捗101%以上"}
+
   drawdown:              # 3か月高値からの下落率（%）
     - {min: 30.0, points: 15, label: "高値から30%以上下落"}
     - {min: 20.0, points: 10, label: "高値から20%以上下落"}
