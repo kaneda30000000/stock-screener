@@ -624,9 +624,12 @@ def _row(r, rank, smax):
     attrs.append(f'data-r-chg1="{_raw(r.get("chg_1d"))}"')
     attrs.append(f'data-r-chg3="{_raw(r.get("chg_3d"))}"')
 
+    short = _short(r.get("name"))
     return f"""<tr {' '.join(attrs)}>
-<th class="name" scope="row"><div class="nb"><span class="rank">{rank}</span>
-  <span class="ident"><b>{name}{tag}</b><small>{code} ・ {sector}</small></span></div></th>
+<th class="name" scope="row" title="{name}"><div class="nb"><span class="rank">{rank}</span>
+  <span class="ident {_name_cls(short)}">{html.escape(short)}{tag}</span></div></th>
+<td class="code">{code}</td>
+<td class="sector">{sector}</td>
 <td class="total"><b>{score}</b><span class="track"><i style="width:{pct}%"></i></span></td>
 {''.join(cells)}
 <td class="{_chg_cls(r.get('chg_1d'))}">{_f(r.get("chg_1d"), 1, "%")}</td>
@@ -646,6 +649,36 @@ def _raw(v):
         return f"{f:.6f}"
     except (TypeError, ValueError):
         return "1e18"
+
+
+ABBREV = [
+    ("ホールディングス", "HD"), ("ホールディングズ", "HD"), ("ホールディング", "HD"),
+    ("インターナショナル", "IN"), ("コンサルティング", "CS"),
+    ("エンジニアリング", "EG"), ("コーポレーション", "CO"),
+    ("ソリューションズ", "SL"), ("ソリューション", "SL"),
+    ("テクノロジーズ", "TC"), ("テクノロジー", "TC"),
+    ("インベストメント", "IV"), ("マネジメント", "MG"),
+    ("パートナーズ", "PT"), ("プロダクツ", "PD"), ("グループ", "G"),
+]
+
+
+def _short(name):
+    """長い社名を詰める。よくある後ろの語を2文字までの略称にする。"""
+    s = str(name or "")
+    for a, b in (("株式会社", ""), ("（株）", ""), ("(株)", "")):
+        s = s.replace(a, b)
+    for a, b in ABBREV:
+        s = s.replace(a, b)
+    return s.replace("・", "").strip()
+
+
+def _name_cls(s):
+    n = len(s)
+    if n >= 13:
+        return "n3"
+    if n >= 9:
+        return "n2"
+    return "n1"
 
 
 def _chg_cls(v):
@@ -707,7 +740,7 @@ CSS = """
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;
   font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
-.wrap{max-width:1400px;margin:0 auto;padding:18px 14px 56px}
+.wrap{max-width:none;margin:0 auto;padding:18px 14px 36px}
 h1{font-size:18px;margin:0 0 3px}
 .sub{color:var(--ink2);font-size:12px;margin:0}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:13px 0 10px;max-width:520px}
@@ -715,7 +748,7 @@ h1{font-size:18px;margin:0 0 3px}
 .stat span{display:block;font-size:10.5px;color:var(--ink3);white-space:nowrap}
 .stat b{font-size:17px;font-variant-numeric:tabular-nums}
 .hint{font-size:11.5px;color:var(--ink3);margin:0 0 8px}
-.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;
+.scroll{overflow:auto;-webkit-overflow-scrolling:touch;
   background:var(--surface);border:1px solid var(--line);border-radius:12px}
 table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
 th,td{white-space:nowrap;padding:7px 9px;border-bottom:1px solid var(--line2);text-align:right}
@@ -729,25 +762,47 @@ thead th.s.up::after{content:"⌃"}
 thead th.s.on{color:var(--accent)}
 thead th.s.on::after{opacity:1}
 th.name,thead th.name{position:sticky;left:0;z-index:4;background:var(--surface);
-  text-align:left;min-width:196px;max-width:196px;white-space:normal;
+  text-align:left;min-width:170px;max-width:170px;white-space:normal;
   border-right:1px solid var(--line)}
+td.code{color:var(--ink2);font-size:12.5px}
+td.sector{color:var(--ink3);font-size:11.5px;text-align:left;min-width:86px}
 tbody th.name{z-index:2;font-weight:400}
 .nb{display:flex;gap:7px;align-items:flex-start}
-.rank{flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:6px;
-  background:var(--accent-soft);color:var(--accent);font-size:10.5px;font-weight:700;
-  margin-top:2px}
-.ident{min-width:0}
-.ident b{display:block;font-size:13px;font-weight:600;line-height:1.3}
-.ident small{display:block;font-size:10.5px;color:var(--ink3)}
+.rank{flex:none;display:grid;place-items:center;width:19px;height:18px;border-radius:5px;
+  background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:700;
+  margin-top:1px}
+.ident{min-width:0;font-weight:600;line-height:1.25;word-break:break-word}
+.ident.n1{font-size:13px}
+.ident.n2{font-size:11.5px}
+.ident.n3{font-size:10px}
 td.total{min-width:80px}
 td.total b{font-size:16px;font-weight:700}
 td.total .track{display:block;height:3px;border-radius:2px;background:var(--line);margin-top:4px}
 td.total i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+/* PCではページ全体を画面の高さに収め、表が残りを全部使う。
+   こうすると横スクロールのバーが常に画面内に出る。 */
+@media(min-width:760px){
+  .wrap{height:100dvh;display:flex;flex-direction:column;padding-bottom:10px}
+  h1,.sub,.stats,.hint,.alert,details.about,footer{flex:none}
+  .alert{margin-bottom:10px}
+  .alert .scroll{max-height:24vh}
+  .scroll.main{flex:1 1 auto;min-height:240px}
+  details.about{margin-top:10px}
+  footer{margin-top:8px}
+}
 @media(max-width:560px){
-  th.name,thead th.name{min-width:150px;max-width:150px}
-  .ident b{font-size:12px}
+  th.name,thead th.name{min-width:66px;max-width:66px;padding-left:5px;padding-right:4px}
+  .nb{gap:4px}
+  .rank{width:14px;height:14px;font-size:8.5px;border-radius:4px}
+  .ident.n1{font-size:11px}
+  .ident.n2{font-size:9.5px}
+  .ident.n3{font-size:8.5px}
   th,td{padding:6px 7px}
   td.m{min-width:64px}
+  td.code{font-size:11px;min-width:auto}
+  td.sector{font-size:10px;min-width:56px}
+  td.total{min-width:66px}
+  .tag{margin-left:0;font-size:8.5px;padding:0 3px}
 }
 td.m{min-width:72px}
 td.m .val{display:block;font-size:13px}
@@ -829,6 +884,7 @@ def render_page(passed, allrows, cfg, meta, out_path):
     smax = int(passed["score_max"].max()) if len(passed) else 0
 
     heads = ['<th class="name" scope="col">銘柄</th>',
+             '<th scope="col">コード</th>', '<th scope="col">業種</th>',
              '<th class="s on" data-key="score" scope="col">合計<br>/' + str(smax) + '</th>']
     for key, _col, label, _u, _d, _h in METRIC_INFO:
         heads.append(f'<th class="s" data-key="{key}" scope="col">{label}</th>')
@@ -842,7 +898,7 @@ def render_page(passed, allrows, cfg, meta, out_path):
         table = ('<div class="empty">今日は必須条件をすべて満たす銘柄がありませんでした。'
                  '<br>条件をゆるめたい場合は config.yml の数字を調整してください。</div>')
     else:
-        table = ('<div class="scroll"><table id="main"><thead><tr>' + "".join(heads)
+        table = ('<div class="scroll main"><table id="main"><thead><tr>' + "".join(heads)
                  + '</tr></thead><tbody>' + body + '</tbody></table></div>')
 
     alert_block = _alert_block(passed, smax)
