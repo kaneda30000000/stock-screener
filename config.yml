@@ -114,3 +114,6 @@ display:
   #   日経          https://www.nikkei.com/nkd/company/?scode={code}
   # 飛び先をなくしたいときは空欄（""）にしてください。
   link_url: "https://kabutan.jp/stock/?code={code}"
+
+  # 上の「朝のブリーフ」タブの飛び先。空欄（""）にするとタブが出ません。
+  brief_url: "https://claude.ai/artifact/TyoWrj3u7pDo1YEh7ydYTX"
