@@ -106,3 +106,11 @@ alerts:
 # -------------------- 表示 --------------------
 display:
   max_rows: 150          # ページに載せる最大銘柄数（合計点の高い順）
+
+  # 銘柄名をクリックしたときの飛び先。{code} が銘柄コードに置き換わります。
+  #   株探          https://kabutan.jp/stock/?code={code}
+  #   みんかぶ      https://minkabu.jp/stock/{code}
+  #   Yahoo!ファイナンス  https://finance.yahoo.co.jp/quote/{code}.T
+  #   日経          https://www.nikkei.com/nkd/company/?scode={code}
+  # 飛び先をなくしたいときは空欄（""）にしてください。
+  link_url: "https://kabutan.jp/stock/?code={code}"
