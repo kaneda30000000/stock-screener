@@ -202,6 +202,9 @@ def fetch_latest(codes, chunk=120, retries=2):
 # ====================================================================
 FY_DOC_PREFIX = "FYFinancialStatements"
 
+# 四半期の段階（1Q=1 …… 本決算=4）。日本の決算短信は各期とも「期初からの累計」
+STAGE = {"1Q": 1, "2Q": 2, "3Q": 3, "4Q": 4, "FY": 4}
+
 
 def _num(s):
     return pd.to_numeric(s, errors="coerce")
@@ -212,6 +215,87 @@ def _code4(s):
 
 
 # ============================================================ 決算・指標
+def _pct(now, before):
+    """前年同期比（%）。前年が0以下なら比率に意味がないので出さない。"""
+    if now is None or before is None:
+        return np.nan
+    try:
+        now, before = float(now), float(before)
+    except (TypeError, ValueError):
+        return np.nan
+    if np.isnan(now) or np.isnan(before) or before <= 0:
+        return np.nan
+    return (now / before - 1) * 100
+
+
+def _quarterly(df: pd.DataFrame) -> pd.DataFrame:
+    """直近の四半期決算について、前年同期比と会社予想に対する進捗率を出す。
+
+    日本の決算短信の数字は「期初からの累計」なので、
+      ・前年同期比 … 同じ段階（2Qなら2Q）の累計どうしを比べる
+      ・進捗率 …… 累計 ÷（通期予想 × 段階/4）
+    本決算の会社予想は翌期のものなので、進捗率にはその期の途中に
+    出ていた予想（修正があれば修正後）を使う。
+    """
+    d = df.copy()
+    for c in ("Sales", "OP", "FSales", "FOP"):
+        d[c] = _num(d[c]) if c in d.columns else np.nan
+    d["CurFYEn"] = d["CurFYEn"].astype(str)
+    d = d[d["CurFYEn"].str.len() >= 7]
+    d["stage"] = d["CurPerType"].astype(str).map(STAGE)
+    d["is_fs"] = d["DocType"].astype(str).str.contains("FinancialStatements")
+
+    rows = []
+    for code, g in d.groupby("code", sort=False):
+        g = g.sort_values(["CurFYEn", "DiscDate"])
+        fs = g[g["is_fs"] & g["stage"].notna()]
+        if not len(fs):
+            continue
+        fs = fs.sort_values(["CurFYEn", "stage", "DiscDate"])
+        fs = fs.drop_duplicates(subset=["CurFYEn", "stage"], keep="last")
+        last = fs.iloc[-1]
+        stage = int(last["stage"])
+        fy_end = last["CurFYEn"]
+
+        # 前年の同じ段階
+        same = fs[fs["stage"] == stage]
+        prev = same.iloc[-2] if len(same) >= 2 else None
+        s_yoy = _pct(last["Sales"], prev["Sales"]) if prev is not None else np.nan
+        o_yoy = _pct(last["OP"], prev["OP"]) if prev is not None else np.nan
+
+        # 進捗率に使う通期予想
+        pool = g[g["CurFYEn"] == fy_end]
+        pool = (pool[pool["DiscDate"] < last["DiscDate"]] if stage >= 4
+                else pool[pool["DiscDate"] <= last["DiscDate"]])
+        def latest(col):
+            s = pool[col].dropna()
+            return float(s.iloc[-1]) if len(s) else np.nan
+        fsales, fop = latest("FSales"), latest("FOP")
+
+        f = stage / 4.0
+        s_prog = (last["Sales"] / (fsales * f) * 100
+                  if fsales and fsales > 0 and not np.isnan(last["Sales"]) else np.nan)
+        o_prog = (last["OP"] / (fop * f) * 100
+                  if fop and fop > 0 and not np.isnan(last["OP"]) else np.nan)
+        both = [x for x in (s_prog, o_prog) if not (x is None or np.isnan(x))]
+        prog = min(both) if both else np.nan
+
+        rows.append({
+            "code": code,
+            "q_label": f"{str(fy_end)[:7]} {last['CurPerType']}",
+            "q_sales_yoy": s_yoy,
+            "q_op_yoy": o_yoy,
+            "q_progress": prog,
+            "q_sales_progress": s_prog,
+            "q_op_progress": o_prog,
+        })
+    if not rows:
+        return pd.DataFrame(columns=["q_label", "q_sales_yoy", "q_op_yoy",
+                                     "q_progress", "q_sales_progress",
+                                     "q_op_progress"]).rename_axis("code")
+    return pd.DataFrame(rows).set_index("code")
+
+
 def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame,
                        dividend_years: int = 5) -> pd.DataFrame:
     """銘柄ごとに「業績の並び」と「1株あたり指標」をまとめる。"""
@@ -285,6 +369,8 @@ def build_fundamentals(summary: pd.DataFrame, val: pd.DataFrame,
             "ご契約のプランを確認してください。"
         )
     out = pd.DataFrame(rows).set_index("code")
+
+    out = out.join(_quarterly(df), how="left")
 
     # ---- 項目ごとに「いちばん新しい空でない値」を拾う ----
     d = df.sort_values("DiscDate")
@@ -387,6 +473,10 @@ def build_technicals(prices: pd.DataFrame, req: dict) -> pd.DataFrame:
 # (設定キー, 計算列, 表示名, 単位, 小数桁, 大きいほど良いか)
 METRIC_INFO = [
     ("per",              "per",          "PER",        "倍", 1, False),
+    ("q_sales_yoy",      "q_sales_yoy",  "四半期増収率", "%", 1, True),
+    ("q_op_yoy",         "q_op_yoy",     "四半期増益率", "%", 1, True),
+    ("q_sales_progress", "q_sales_progress", "売上進捗率", "%", 0, True),
+    ("q_op_progress",    "q_op_progress",    "利益進捗率", "%", 0, True),
     ("drawdown",         "drawdown",     "下落率",     "%",  1, True),
     ("range_days",       "range_days",   "レンジ日数", "日", 0, True),
     ("operating_margin", "op_margin",    "営業利益率", "%",  1, True),
@@ -542,7 +632,7 @@ def _row(r, rank, smax):
 <td class="{_chg_cls(r.get('chg_1d'))}">{_f(r.get("chg_1d"), 1, "%")}</td>
 <td class="{_chg_cls(r.get('chg_3d'))}">{_f(r.get("chg_3d"), 1, "%")}</td>
 <td class="px">{_f(r.get("price"), 0, "円")}</td>
-<td class="note">{streak}期連続<br>増収増益<br>配当{dy}期</td>
+<td class="note">{streak}期連続増収増益<br>配当{dy}期<br>{html.escape(str(r.get("q_label") or "四半期なし"))}</td>
 <td class="sp">{_sparkline(r.get("spark"))}</td>
 </tr>"""
 
