@@ -1,0 +1,46 @@
+name: 予想用の四本値（J-Quants）
+
+on:
+  schedule:
+    - cron: "30 9 * * 1-5"    # 平日 18:30 JST（当日の四本値が出たあと）
+    - cron: "20 20 * * 0-4"   # 平日 5:20 JST（朝の相場予想 6:01 の前に念のため取り直す）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jq-forecast
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JQ_API_KEY: ${{ secrets.JQ_API_KEY }}
+      JQ_PASSWORD: ${{ secrets.JQ_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests
+
+      - name: 3銘柄とETFの四本値・出来高を取得
+        run: python scripts/jq_forecast.py
+
+      - name: リポジトリに保存
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/jq_forecast.json
+          git diff --staged --quiet && exit 0
+          git commit -m "予想用の四本値: $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep 10
+          done
+          exit 1
