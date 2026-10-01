@@ -1,8 +1,8 @@
 {
- "updated_at": "2026-10-01T16:20:54+09:00",
- "mode": "intraday",
+ "updated_at": "2026-10-02T02:11:00+09:00",
+ "mode": "full",
  "universe": 3516,
  "price_date": "2026-10-01",
- "price_note": " ＋ 16:20時点の遅延株価で更新",
+ "price_note": "",
  "passed": 170
 }
