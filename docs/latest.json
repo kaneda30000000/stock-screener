@@ -1,6 +1,6 @@
 {
  "meta": {
-  "updated_at": "2026-10-12T02:08:37+09:00",
+  "updated_at": "2026-10-13T02:11:10+09:00",
   "mode": "full",
   "universe": 3507,
   "price_date": "2026-10-09",
@@ -2397,29 +2397,6 @@
     "payout_ratio": 10,
     "pbr": 0,
     "equity_ratio": 10
-   }
-  },
-  {
-   "code": "7085",
-   "name": "カーブスホールディングス",
-   "score": 100,
-   "price": 928.0,
-   "per": 17.622483858716294,
-   "div_yield": 3.2327586206896552,
-   "points": {
-    "per": 0,
-    "q_sales_yoy": 20,
-    "q_op_yoy": 30,
-    "q_sales_progress": 0,
-    "q_op_progress": 10,
-    "drawdown": 0,
-    "range_days": 0,
-    "operating_margin": 10,
-    "profit_cagr": 15,
-    "dividend_yield": 10,
-    "payout_ratio": 0,
-    "pbr": 0,
-    "equity_ratio": 5
    }
   },
   {
