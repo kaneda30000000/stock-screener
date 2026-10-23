@@ -37,6 +37,8 @@ S.headers.update({
     "Accept-Language": "ja,en;q=0.8",
 })
 STATUS = {}
+SEC17 = {}          # 4桁コード → 17業種コード（J-Quants の上場銘柄一覧から）
+SEC17_NAMES = {}
 
 
 # ====================================================================
@@ -198,24 +200,8 @@ def jq_sectors(jq, hist):
     dates = sorted(bars["Date"].unique())
     last = dates[-1]
 
-    # ---- 17業種ETFの資金の出入り（時価総額÷終値＝口数 の変化 × 終値）----
-    etf = None
-    e = bars[bars["c4"].isin(ETF17)].copy()
-    if "MktCap" in e and e["MktCap"].notna().any():
-        e["units"] = e["MktCap"] / e["C"]
-        e = e.sort_values(["c4", "Date"])
-        e["flow"] = e.groupby("c4")["units"].diff() * e["C"] / 1e8
-        etf = []
-        for code, g in e.groupby("c4"):
-            g = g.dropna(subset=["flow"])
-            if g.empty:
-                continue
-            etf.append({"code": code, "s17": ETF17[code], "sector": n17.get(ETF17[code]),
-                        "flow1": rnd(g["flow"].iloc[-1], 1), "flow5": rnd(g["flow"].tail(5).sum(), 1),
-                        "flow20": rnd(g["flow"].tail(20).sum(), 1),
-                        "aum": rnd(g["MktCap"].iloc[-1] / 1e8, 0)})
-    else:
-        STATUS["J-Quants：17業種ETFの口数"] = "日足に時価総額（MktCap）が無いため計算できず"
+    SEC17.update(s17)
+    SEC17_NAMES.update(n17)
 
     # ---- 規模の重み：最新日のバリュエーションの時価総額（無ければ20日平均売買代金）----
     w = None
@@ -227,6 +213,39 @@ def jq_sectors(jq, hist):
         STATUS["J-Quants：時価総額（重み）"] = f"失敗のため売買代金で代用: {ex}"[:200]
     if not w:
         w = bars.groupby("c4")["Va"].mean().to_dict()
+
+    # ---- 17業種ETFの資金の出入り：時価総額÷終値＝口数。口数の増減×終値＝資金の出入り ----
+    etf = None
+    try:
+        close = {(r.c4, r.Date): r.C for r in bars[bars["c4"].isin(ETF17)][["c4", "Date", "C"]].itertuples()}
+        pts = {}
+        for back in (0, 5, 20):
+            if len(dates) <= back:
+                continue
+            d = dates[-1 - back]
+            v = val if back == 0 and "val" in dir() else pd.DataFrame(jq.get("/equities/valuation", {"date": d}))
+            v = v.copy()
+            v["c4"] = v["Code"].astype(str).str[:4]
+            v = v[v["c4"].isin(ETF17)]
+            for r in v.itertuples():
+                mc, c = num(getattr(r, "MktCap", None)), close.get((r.c4, d))
+                if mc and c:
+                    pts.setdefault(r.c4, {})[back] = (mc / c, c, mc)
+        if pts:
+            etf = []
+            for code, p in pts.items():
+                if 0 not in p:
+                    continue
+                u0, c0, mc0 = p[0]
+                o = {"code": code, "s17": ETF17[code], "sector": n17.get(ETF17[code]), "aum": rnd(mc0 / 1e8, 0)}
+                for back, key in ((5, "flow5"), (20, "flow20")):
+                    if back in p:
+                        o[key] = rnd((u0 - p[back][0]) * c0 / 1e8, 1)    # 億円
+                etf.append(o)
+        else:
+            STATUS["J-Quants：17業種ETFの口数"] = "バリュエーション指標に17業種ETFの時価総額が無いため計算できず"
+    except Exception as ex:
+        STATUS["J-Quants：17業種ETFの口数"] = f"失敗: {ex}"[:200]
 
     b = bars[bars["c4"].isin(s17)].copy()
     b["w"] = b["c4"].map(w).fillna(0)
@@ -411,11 +430,33 @@ def jpx_margin_weekly(hist):
     url = sorted(links)[-1]
     ymd = re.search(r"(\d{8})_mtcurrent", url).group(1)
     day = f"{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}"
-    rows = read_xlsx_rows(http(url).content, 70)
-    # 形が確定するまでは表の中身をそのまま渡し、まとめ役（定期タスク）が読み取る
-    hist.setdefault(day, {})["margin_weekly_rows"] = rows
-    return {"date": day, "url": url, "rows": rows,
-            "note": "株数は千株、金額は百万円。左の組が東証＋名証、右の組が東証のみ。▲は減少"}
+    rows = read_xlsx_rows(http(url).content, 40)
+    # 表の形（2026年9月からの新形式）：ラベル列のあとに「株数／金額」、続いて二市場の 売残・前週比・買残・前週比
+    want = {"制度信用取引残高": "seido", "一般信用取引残高": "ippan", "信用取引残高合計": "total", "貸借取引残高": "jsf"}
+    out, cur, acct = {}, None, ""
+    for r in rows:
+        lab = " ".join(r[1:3])
+        if r[1].strip():        # 左端の見出しが変わったら、対象の区分も切り替える（社内対当・自己貸株などは読まない）
+            cur = next((v for k, v in want.items() if k in r[1]), None)
+            acct = ""
+        if "委託" in lab:
+            acct = "cust"
+        elif "自己" in lab and "自己貸株" not in lab:
+            acct = "prop"
+        unit = r[3] if len(r) > 3 else ""
+        if cur and unit.startswith(("株数", "金額")) and len(r) >= 8:
+            key = cur if cur in ("total", "jsf") else f"{cur}_{acct}"
+            u = "shs" if unit.startswith("株数") else "val"
+            out.setdefault(key, {})[u] = {"sell": num(r[4]), "sell_chg": num(r[5]), "buy": num(r[6]), "buy_chg": num(r[7])}
+    t = out.get("total")
+    if not t or "shs" not in t:
+        raise RuntimeError("信用取引残高合計の行が読めない（表の形が変わった可能性）")
+    res = {"date": day, "url": url, "unit": "株数は千株、金額は百万円（二市場）", "table": out,
+           "ratio": rnd(t["shs"]["buy"] / t["shs"]["sell"], 2) if t["shs"]["sell"] else None}
+    hist.setdefault(day, {})["margin_weekly"] = {"buy_val": t.get("val", {}).get("buy"), "sell_val": t.get("val", {}).get("sell"),
+                                                 "ratio": res["ratio"]}
+    hist[day].pop("margin_weekly_rows", None)
+    return res
 
 
 @step("JPX：日々公表銘柄の信用残（毎日）")
@@ -435,38 +476,13 @@ def jpx_margin_daily():
             "note": "日々公表銘柄（信用取引が過熱気味として取引所が毎日残高を出している銘柄）の一覧"}
 
 
-@step("JPX：全銘柄の信用残（毎日・PDF）")
-def jpx_margin_all(hist):
-    """2026年9月から毎日公表になった銘柄別信用取引残高。全銘柄を業種別に集計する。
-    PDF の列の並びがまだ確かめられていないため、初回は読み取れた見本を残して形を確認する。"""
-    links = jpx_links("/markets/statistics-equities/margin/01.html", r"\d{8}_mtall\.pdf$")
-    if not links:
-        raise RuntimeError("銘柄別信用取引残高のPDFが見つからない")
-    url = sorted(links)[-1]
-    ymd = re.search(r"(\d{8})_mtall", url).group(1)
-    text = pdf_text(http(url).content)
-    lines = [l.replace("　", " ") for l in text.splitlines()]
-    blocks, code = [], None
-    for l in lines:
-        m = re.search(r"\b(\d{3}[0-9A-Z]0)\b", l)
-        if m and ("株式" in l or "受益" in l or "投信" in l or "証券" in l):
-            code = m.group(1)[:4]
-            continue
-        if code and (l.strip().startswith("株数") or "Shs" in l):
-            vals = [num(x) for x in re.findall(r"▲?[\d,]+(?:\.\d+)?", l)]
-            blocks.append({"code": code, "shs": [v for v in vals if v is not None]})
-            code = None
-    if len(blocks) < 500:
-        raise RuntimeError(f"銘柄の行が{len(blocks)}件しか読めない")
-    return {"date": f"{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}", "count": len(blocks),
-            "sample": blocks[:6], "sample_text": "\n".join(lines[:40]),
-            "note": "列の並び未確認のため、集計は形の確認後に追加"}
-
-
-@step("日証金：貸借取引残高（銘柄別）")
-def jsf_balance():
+@step("日証金：貸借取引の新規・返済・残高（毎日・業種別）")
+def jsf_balance(hist):
+    """日証金の銘柄別残高一覧（前営業日の申込分）。証券会社が日証金から借りた分なので、制度信用の動きの大部分を表す。
+    融資＝信用の買い（個人の買いが中心）、貸株＝信用の売り。"""
     import pandas as pd
     r = http("https://www.taisyaku.jp/data/zandaka.csv")
+    text = None
     for enc in ("cp932", "utf-8-sig"):
         try:
             text = r.content.decode(enc)
@@ -474,11 +490,38 @@ def jsf_balance():
         except UnicodeDecodeError:
             continue
     lines = text.splitlines()
-    # 見出し行を探す（「コード」を含む行）
-    hi = next((i for i, l in enumerate(lines[:15]) if "コード" in l), 0)
+    hi = next((i for i, l in enumerate(lines[:15]) if "銘柄コード" in l), 0)
     df = pd.read_csv(io.StringIO("\n".join(lines[hi:])), dtype=str)
-    return {"head": lines[:hi + 1], "columns": list(df.columns), "rows": len(df),
-            "sample": df.head(5).fillna("").values.tolist()}
+    cols = ["融資新規金額", "融資返済金額", "融資残高金額", "貸株新規金額", "貸株返済金額", "貸株残高金額",
+            "融資新規株数", "融資残高株数", "貸株新規株数", "貸株残高株数"]
+    for c in cols:
+        df[c] = pd.to_numeric(df[c].str.replace(",", ""), errors="coerce").fillna(0)
+    day = str(df["申込日"].dropna().iloc[0]).replace("/", "-")
+    df["c4"] = df["銘柄コード"].astype(str).str[:4]
+    df["s17"] = df["c4"].map(SEC17)
+    oku = lambda x: rnd(x / 1e8, 1)
+    def summ(g):
+        return {"buy_new": oku(g["融資新規金額"].sum()), "buy_repay": oku(g["融資返済金額"].sum()), "buy_bal": oku(g["融資残高金額"].sum()),
+                "sell_new": oku(g["貸株新規金額"].sum()), "sell_repay": oku(g["貸株返済金額"].sum()), "sell_bal": oku(g["貸株残高金額"].sum())}
+    total = summ(df[df["s17"].notna()]) if SEC17 else summ(df)
+    sec = {k: {"name": SEC17_NAMES.get(k, k), **summ(g)} for k, g in df[df["s17"].notna()].groupby("s17")} if SEC17 else {}
+    hist.setdefault(day, {})["jsf"] = {"total": total, "sec": {k: [v["buy_new"], v["buy_bal"], v["sell_new"], v["sell_bal"]] for k, v in sec.items()}}
+    # 直近5日・20日の平均と比べる（記録がたまるまでは出ない）
+    days = sorted(d for d in hist if "jsf" in hist[d] and d <= day)
+    prev = [hist[d]["jsf"]["total"] for d in days[-21:-1]]
+    if prev:
+        total["buy_new_avg"] = rnd(sum(p["buy_new"] or 0 for p in prev) / len(prev), 1)
+        total["sell_new_avg"] = rnd(sum(p["sell_new"] or 0 for p in prev) / len(prev), 1)
+        total["buy_bal_chg"] = rnd(total["buy_bal"] - prev[-1]["buy_bal"], 1) if prev[-1].get("buy_bal") is not None else None
+        total["sell_bal_chg"] = rnd(total["sell_bal"] - prev[-1]["sell_bal"], 1) if prev[-1].get("sell_bal") is not None else None
+    if len(days) >= 6:
+        for k, v in sec.items():
+            p5 = [hist[d]["jsf"]["sec"].get(k) for d in days[-6:-1] if k in hist[d]["jsf"].get("sec", {})]
+            if p5:
+                v["buy_bal_chg5"] = rnd(v["buy_bal"] - p5[0][1], 1)
+                v["sell_bal_chg5"] = rnd(v["sell_bal"] - p5[0][3], 1)
+    return {"date": day, "unit": "億円（日証金の貸借取引。融資＝信用の買い、貸株＝信用の売り）", "total": total,
+            "sectors": sec, "history_days": len(days), "issues": len(df)}
 
 
 # ====================================================================
@@ -596,27 +639,45 @@ def cftc():
 # ====================================================================
 @step("韓国：KOSPIの投資主体別売買（NAVER）")
 def korea():
-    import pandas as pd
-    today = dt.datetime.now(JST).strftime("%Y%m%d")
-    r = http("https://finance.naver.com/sise/investorDealTrendDay.naver",
-             params={"bizdate": today, "sosok": "01"})
-    r.encoding = "euc-kr"
-    tables = pd.read_html(io.StringIO(r.text))
-    t = max(tables, key=len)
-    t = t.dropna(how="all")
-    cols = [" ".join(map(str, c)) if isinstance(c, tuple) else str(c) for c in t.columns]
-    t.columns = cols
-    pick = lambda key: next((c for c in cols if key in c), None)
-    cd, ci, cf, cs = pick("날짜"), pick("개인"), pick("외국인"), pick("기관")
-    rows = []
-    for _, x in t.iterrows():
-        d = str(x[cd]) if cd else ""
-        if not re.match(r"\d{2}\.\d{2}\.\d{2}", d):
+    """NAVER のスマホ向けページが使うデータ（指数の総合情報に、投資主体別の売買が入っている）。"""
+    errs = []
+    for url in ("https://m.stock.naver.com/api/index/KOSPI/integration",
+                "https://m.stock.naver.com/api/index/KOSPI/trend"):
+        try:
+            j = http(url, headers={"Referer": "https://m.stock.naver.com/"}).json()
+        except Exception as e:
+            errs.append(str(e)[:80])
             continue
-        rows.append({"date": "20" + d.replace(".", "-"), "ind": num(x[ci]), "frgn": num(x[cf]), "inst": num(x[cs])})
-    if not rows:
-        raise RuntimeError("表が読めない")
-    return {"unit": "億ウォン（買い−売り）", "rows": rows[:10]}
+        lst = None
+        def walk(o):
+            nonlocal lst
+            if lst is not None:
+                return
+            if isinstance(o, list) and o and isinstance(o[0], dict) and any("foreign" in k.lower() for k in o[0]):
+                lst = o
+            elif isinstance(o, dict):
+                for v in o.values():
+                    walk(v)
+            elif isinstance(o, list):
+                for v in o:
+                    walk(v)
+        walk(j)
+        if not lst:
+            errs.append(f"{url.rsplit('/', 1)[-1]}: 投資主体別の欄なし（キー: {list(j)[:8] if isinstance(j, dict) else type(j).__name__}）")
+            continue
+        def pick(d, *keys):
+            for k in d:
+                if any(x in k.lower() for x in keys):
+                    return num(d[k])
+            return None
+        rows = []
+        for d in lst:
+            date = str(d.get("bizdate") or d.get("localTradedAt") or d.get("date") or "")
+            date = re.sub(r"^(\d{4})(\d{2})(\d{2})$", r"\1-\2-\3", date[:10])
+            rows.append({"date": date, "ind": pick(d, "personal", "individual"), "frgn": pick(d, "foreign"),
+                         "inst": pick(d, "institution", "organ")})
+        return {"unit": "億ウォン（買い−売り）", "rows": rows[:10], "raw_keys": list(lst[0])[:12]}
+    raise RuntimeError(" / ".join(errs))
 
 
 @step("台湾：三大法人の売買と信用取引（TWSE）")
@@ -662,7 +723,8 @@ def taiwan():
 def semis():
     h = yf_hist(list(SEMIS) + ["SPY"])
     base = h.get("SPY")
-    return {t: {"name": n, **perf(h[t], base if not t.endswith((".T", ".KS", ".TW", ".SS", ".AS")) else None)}
+    us_listed = lambda t: t in ("ASML", "^SOX", "SMH")
+    return {t: {"name": n, **perf(h[t], base if us_listed(t) else None)}
             for t, n in SEMIS.items() if t in h}
 
 
@@ -689,8 +751,7 @@ def main():
     out["jp"]["short_ratio"] = jpx_short_ratio(hist)
     out["jp"]["margin_weekly"] = jpx_margin_weekly(hist)
     out["jp"]["margin_daily"] = jpx_margin_daily()
-    out["jp"]["margin_all"] = jpx_margin_all(hist)
-    out["jp"]["jsf"] = jsf_balance()
+    out["jp"]["jsf"] = jsf_balance(hist)
     out["us"] = us_sectors(hist)
     out["cftc"] = cftc()
     out["kr"] = korea()
