@@ -117,3 +117,5 @@ display:
 
   # 上の「朝のブリーフ」タブの飛び先。空欄（""）にするとタブが出ません。
   brief_url: "https://claude.ai/artifact/TyoWrj3u7pDo1YEh7ydYTX"
+  forecast_url: "https://claude.ai/artifact/Ca71r1rnMCiAvQHPgbQTFL"
+  flow_url: "https://claude.ai/artifact/TuwKLJNMrxVxhggWp6x5iA"

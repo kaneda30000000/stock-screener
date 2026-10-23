@@ -913,8 +913,11 @@ a.tab:hover{color:var(--ink2);background:var(--line2);border-radius:8px 8px 0 0}
 def render_page(passed, allrows, cfg, meta, out_path):
     LINK_TMPL[0] = str(cfg["display"].get("link_url") or "")
     burl = str(cfg["display"].get("brief_url") or "")
-    brief_tab = (f'<a class="tab" href="{html.escape(burl, quote=True)}">'
-                 '朝のブリーフ<span class="ext">↗</span></a>') if burl else ""
+    tabs = [("朝のブリーフ", burl),
+            ("今日の予想", str(cfg["display"].get("forecast_url") or "")),
+            ("資金の流れ", str(cfg["display"].get("flow_url") or ""))]
+    brief_tab = "".join(f'<a class="tab" href="{html.escape(u, quote=True)}">'
+                        f'{t}<span class="ext">↗</span></a>' for t, u in tabs if u)
     rows = passed.head(int(cfg["display"]["max_rows"]))
     smax = int(passed["score_max"].max()) if len(passed) else 0
 
@@ -971,8 +974,8 @@ def render_page(passed, allrows, cfg, meta, out_path):
 <body>
 <div class="wrap">
   <nav class="tabs">
-    <span class="tab on">スクリーニング</span>
     {brief_tab}
+    <span class="tab on">スクリーニング</span>
   </nav>
   <h1>買い時スクリーニング</h1>
   <p class="sub">最終更新 {now}（日本時間）・株価基準 {html.escape(str(meta.get('price_date','—')))}{html.escape(meta.get('price_note',''))}</p>
