@@ -1,0 +1,46 @@
+name: 資金の流れ（業種・投資主体・信用）
+
+on:
+  schedule:
+    - cron: "40 8 * * 1-5"    # 平日 17:40 JST（日本の四本値・空売り比率・信用残が出たあと）
+    - cron: "40 21 * * 0-4"   # 平日 6:40 JST（米国の引け・ETFの口数が出たあと。定期タスク 7:25 の前）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: flow
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      JQ_API_KEY: ${{ secrets.JQ_API_KEY }}
+      JQ_PASSWORD: ${{ secrets.JQ_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests pandas openpyxl pypdf lxml yfinance
+
+      - name: 業種・投資主体・信用のデータを取得
+        run: python scripts/flow.py
+
+      - name: リポジトリに保存
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/flow.json data/flow_hist.json
+          git diff --staged --quiet && exit 0
+          git commit -m "資金の流れ: $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep 10
+          done
+          exit 1
