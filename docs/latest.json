@@ -1,10 +1,10 @@
 {
  "meta": {
-  "updated_at": "2026-10-30T17:55:40+09:00",
+  "updated_at": "2026-10-30T22:58:16+09:00",
   "mode": "intraday",
   "universe": 3512,
   "price_date": "2026-10-30",
-  "price_note": " ＋ 17:55時点の遅延株価で更新"
+  "price_note": " ＋ 22:58時点の遅延株価で更新"
  },
  "stocks": [
   {
@@ -3731,29 +3731,6 @@
     "payout_ratio": 0,
     "pbr": 0,
     "equity_ratio": 10
-   }
-  },
-  {
-   "code": "3395",
-   "name": "サンマルクホールディングス",
-   "score": 45,
-   "price": 2568.0,
-   "per": 18.981447261438394,
-   "div_yield": 2.102803738317757,
-   "points": {
-    "per": 0,
-    "q_sales_yoy": 10,
-    "q_op_yoy": 0,
-    "q_sales_progress": 0,
-    "q_op_progress": 0,
-    "drawdown": 0,
-    "range_days": 10,
-    "operating_margin": 0,
-    "profit_cagr": 0,
-    "dividend_yield": 10,
-    "payout_ratio": 10,
-    "pbr": 0,
-    "equity_ratio": 5
    }
   },
   {
