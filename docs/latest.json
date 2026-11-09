@@ -1,10 +1,10 @@
 {
  "meta": {
-  "updated_at": "2026-11-09T19:13:13+09:00",
+  "updated_at": "2026-11-10T02:22:35+09:00",
   "mode": "intraday",
   "universe": 3534,
   "price_date": "2026-11-09",
-  "price_note": " ＋ 19:13時点の遅延株価で更新"
+  "price_note": " ＋ 02:22時点の遅延株価で更新"
  },
  "stocks": [
   {
@@ -1891,29 +1891,6 @@
     "payout_ratio": 10,
     "pbr": 10,
     "equity_ratio": 0
-   }
-  },
-  {
-   "code": "4809",
-   "name": "パラカ",
-   "score": 110,
-   "price": 1908.0,
-   "per": 9.603865706951225,
-   "div_yield": 3.7735849056603774,
-   "points": {
-    "per": 30,
-    "q_sales_yoy": 10,
-    "q_op_yoy": 0,
-    "q_sales_progress": 0,
-    "q_op_progress": 0,
-    "drawdown": 0,
-    "range_days": 15,
-    "operating_margin": 10,
-    "profit_cagr": 10,
-    "dividend_yield": 10,
-    "payout_ratio": 10,
-    "pbr": 10,
-    "equity_ratio": 5
    }
   },
   {
