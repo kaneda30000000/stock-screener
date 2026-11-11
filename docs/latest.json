@@ -1,10 +1,10 @@
 {
  "meta": {
-  "updated_at": "2026-11-11T18:47:57+09:00",
+  "updated_at": "2026-11-12T00:02:08+09:00",
   "mode": "intraday",
   "universe": 3520,
   "price_date": "2026-11-11",
-  "price_note": " ＋ 18:47時点の遅延株価で更新"
+  "price_note": " ＋ 00:02時点の遅延株価で更新"
  },
  "stocks": [
   {
@@ -3113,6 +3113,29 @@
    }
   },
   {
+   "code": "8060",
+   "name": "キヤノンマーケティングジャパン",
+   "score": 80,
+   "price": 3853.0,
+   "per": 18.029948525970987,
+   "div_yield": 2.4656112120425644,
+   "points": {
+    "per": 0,
+    "q_sales_yoy": 10,
+    "q_op_yoy": 20,
+    "q_sales_progress": 0,
+    "q_op_progress": 10,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 5,
+    "profit_cagr": 10,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 10
+   }
+  },
+  {
    "code": "4385",
    "name": "メルカリ",
    "score": 80,
@@ -3409,29 +3432,6 @@
     "payout_ratio": 10,
     "pbr": 0,
     "equity_ratio": 5
-   }
-  },
-  {
-   "code": "8060",
-   "name": "キヤノンマーケティングジャパン",
-   "score": 75,
-   "price": 3868.0,
-   "per": 18.10014038371549,
-   "div_yield": 2.456049638055843,
-   "points": {
-    "per": 0,
-    "q_sales_yoy": 10,
-    "q_op_yoy": 20,
-    "q_sales_progress": 0,
-    "q_op_progress": 10,
-    "drawdown": 0,
-    "range_days": 0,
-    "operating_margin": 5,
-    "profit_cagr": 10,
-    "dividend_yield": 10,
-    "payout_ratio": 0,
-    "pbr": 0,
-    "equity_ratio": 10
    }
   },
   {
