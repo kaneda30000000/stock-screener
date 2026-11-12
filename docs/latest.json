@@ -1,10 +1,10 @@
 {
  "meta": {
-  "updated_at": "2026-11-12T19:10:59+09:00",
+  "updated_at": "2026-11-13T00:55:19+09:00",
   "mode": "intraday",
   "universe": 3533,
   "price_date": "2026-11-12",
-  "price_note": " ＋ 19:10時点の遅延株価で更新"
+  "price_note": " ＋ 00:55時点の遅延株価で更新"
  },
  "stocks": [
   {
@@ -28,29 +28,6 @@
     "payout_ratio": 10,
     "pbr": 10,
     "equity_ratio": 0
-   }
-  },
-  {
-   "code": "8789",
-   "name": "フィンテック　グローバル",
-   "score": 215,
-   "price": 112.0,
-   "per": 8.452830188679245,
-   "div_yield": 4.464285714285714,
-   "points": {
-    "per": 30,
-    "q_sales_yoy": 30,
-    "q_op_yoy": 30,
-    "q_sales_progress": 20,
-    "q_op_progress": 30,
-    "drawdown": 15,
-    "range_days": 0,
-    "operating_margin": 10,
-    "profit_cagr": 15,
-    "dividend_yield": 15,
-    "payout_ratio": 10,
-    "pbr": 5,
-    "equity_ratio": 5
    }
   },
   {
@@ -3553,9 +3530,9 @@
    "code": "8593",
    "name": "三菱ＨＣキャピタル",
    "score": 70,
-   "price": 1342.0,
-   "per": 12.026167219284881,
-   "div_yield": 3.8002980625931446,
+   "price": 1348.5,
+   "per": 12.084416166323146,
+   "div_yield": 3.781979977753059,
    "points": {
     "per": 15,
     "q_sales_yoy": 0,
