@@ -624,6 +624,7 @@ def _row(r, rank, smax):
     attrs.append(f'data-r-chg1="{_raw(r.get("chg_1d"))}"')
     attrs.append(f'data-r-chg3="{_raw(r.get("chg_3d"))}"')
 
+    attrs.append(f'data-sec="{sector}"')
     short = _short(r.get("name"))
     return f"""<tr {' '.join(attrs)}>
 <th class="name" scope="row" title="{name}"><div class="nb"><span class="rank">{rank}</span>
@@ -711,7 +712,7 @@ def _alert_block(passed, smax):
     rows = ""
     for code, r in hit.iterrows():
         rows += (
-            f'<tr><th scope="row">'
+            f'<tr data-sec="{html.escape(str(r.get("sector") or ""), quote=True)}"><th scope="row">'
             + _link(code, "<b>" + html.escape(str(r.get("name") or "")) + "</b>")
             + f'<small>{html.escape(str(code))} ・ {html.escape(str(r.get("sector") or ""))}</small></th>'
             f'<td class="chg down">{_f(r.get("chg_1d"), 1, "%")}</td>'
@@ -799,7 +800,7 @@ td.total i{display:block;height:100%;border-radius:2px;background:var(--accent)}
    こうすると横スクロールのバーが常に画面内に出る。 */
 @media(min-width:760px){
   .wrap{height:100dvh;display:flex;flex-direction:column;padding-bottom:10px}
-  .tabs,h1,.sub,.stats,.hint,.alert,details.about,footer{flex:none}
+  .tabs,h1,.sub,.stats,.filter,.hint,.alert,details.about,footer{flex:none}
   .alert{margin-bottom:10px}
   .alert .scroll{max-height:24vh}
   .scroll.main{flex:1 1 auto;min-height:240px}
@@ -850,6 +851,18 @@ td.note{font-size:10px;color:var(--ink3);line-height:1.35;text-align:left}
 td.sp{color:var(--accent);padding-right:12px}
 tbody tr:hover th.name,tbody tr:hover td{background:var(--line2)}
 .empty{padding:30px 16px;text-align:center;color:var(--ink2)}
+.filter{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:0 0 8px}
+.filter label{font-size:12.5px;font-weight:600;color:var(--ink2)}
+.filter select{font:inherit;font-size:16px;padding:6px 30px 6px 10px;min-height:38px;max-width:100%;
+  border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);
+  -webkit-appearance:none;appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.filter select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.filter.on select{border-color:var(--accent);color:var(--accent);font-weight:600}
+.filter .clear{font:inherit;font-size:12.5px;color:var(--accent);background:none;border:0;padding:6px 4px;cursor:pointer}
+.filter .clear[hidden]{display:none}
+.filter .cnt{font-size:12px;color:var(--ink3)}
 details.about{margin-top:22px;font-size:12.5px;color:var(--ink2)}
 details.about summary{cursor:pointer;color:var(--ink);font-weight:600}
 details.about table{margin-top:10px;width:auto;max-width:820px}
@@ -875,22 +888,61 @@ JS = """
       var va=+a.getAttribute('data-v-'+key), vb=+b.getAttribute('data-v-'+key);
       return vb-va;
     });
-    rows.forEach(function(r,i){
-      tb.appendChild(r);
-      var k=r.querySelector('.rank'); if(k) k.textContent=i+1;
-    });
+    rows.forEach(function(r){ tb.appendChild(r); });
     heads.forEach(function(h){h.classList.toggle('on',h===th);});
     try{localStorage.setItem('sortKey',key);}catch(e){}
+    apply();
+  }
+  /* 業種の絞り込み。「すべて」のときは上から表示上限（data-limit）まで、業種を選んだときはその業種の全銘柄を出す */
+  var sel=document.getElementById('sec'), box=document.getElementById('secbox');
+  var clr=document.getElementById('secclear'), cnt=document.getElementById('seccnt');
+  var shown=document.getElementById('shown'), alertBox=document.querySelector('section.alert');
+  var limit=+tbl.getAttribute('data-limit')||1e9;
+  function apply(){
+    var v=sel?sel.value:'', n=0;
+    Array.prototype.forEach.call(tb.querySelectorAll('tr'),function(r){
+      var ok=(!v||r.getAttribute('data-sec')===v)&&(v||n<limit);
+      r.hidden=!ok;
+      if(ok){ n++; var k=r.querySelector('.rank'); if(k) k.textContent=n; }
+    });
+    if(shown) shown.textContent=n.toLocaleString();
+    if(box) box.classList.toggle('on',!!v);
+    if(clr) clr.hidden=!v;
+    if(cnt) cnt.textContent=v?(n+'銘柄'):'';
+    if(alertBox){
+      var m=0;
+      Array.prototype.forEach.call(alertBox.querySelectorAll('tbody tr'),function(r){
+        var ok=!v||r.getAttribute('data-sec')===v; r.hidden=!ok; if(ok) m++;
+      });
+      alertBox.hidden=!m;
+      var em=alertBox.querySelector('h2 em'); if(em) em.textContent=m+'銘柄';
+    }
+  }
+  if(sel){
+    var savedSec=null; try{savedSec=localStorage.getItem('sector');}catch(e){}
+    if(savedSec){
+      for(var j=0;j<sel.options.length;j++){ if(sel.options[j].value===savedSec){ sel.value=savedSec; break; } }
+    }
+    sel.addEventListener('change',function(){
+      try{localStorage.setItem('sector',sel.value);}catch(e){}
+      apply();
+    });
+    if(clr) clr.addEventListener('click',function(){
+      sel.value=''; try{localStorage.setItem('sector','');}catch(e){}
+      apply(); sel.focus();
+    });
   }
   heads.forEach(function(th){
     th.addEventListener('click',function(){sort(th.dataset.key,th);});
   });
   var saved=null; try{saved=localStorage.getItem('sortKey');}catch(e){}
+  var done=false;
   if(saved){
     for(var i=0;i<heads.length;i++){
-      if(heads[i].dataset.key===saved){sort(saved,heads[i]);break;}
+      if(heads[i].dataset.key===saved){sort(saved,heads[i]);done=true;break;}
     }
   }
+  if(!done) apply();
 })();
 """
 
@@ -918,8 +970,22 @@ def render_page(passed, allrows, cfg, meta, out_path):
             ("資金の流れ", str(cfg["display"].get("flow_url") or ""))]
     brief_tab = "".join(f'<a class="tab" href="{html.escape(u, quote=True)}">'
                         f'{t}<span class="ext">↗</span></a>' for t, u in tabs if u)
-    rows = passed.head(int(cfg["display"]["max_rows"]))
+    limit = int(cfg["display"]["max_rows"])
+    rows = passed          # 業種で絞り込んだときに全銘柄を出せるよう、通過銘柄はすべて表に入れる
+    shown = min(len(passed), limit)
     smax = int(passed["score_max"].max()) if len(passed) else 0
+
+    # 業種の選択欄（通過銘柄の多い業種から順に、銘柄数つき）
+    sec_counts = (passed["sector"].fillna("").astype(str).replace("", "（業種なし）").value_counts()
+                  if len(passed) and "sector" in passed.columns else pd.Series(dtype=int))
+    sec_opts = "".join(
+        f'<option value="{html.escape("" if n == "（業種なし）" else n, quote=True)}">{html.escape(n)}（{int(c)}）</option>'
+        for n, c in sec_counts.items() if n != "（業種なし）")
+    sec_filter = ('' if not len(passed) else
+                  '<div class="filter" id="secbox"><label for="sec">業種で絞り込み</label>'
+                  f'<select id="sec"><option value="">すべての業種（{len(passed)}）</option>{sec_opts}</select>'
+                  '<span class="cnt" id="seccnt" aria-live="polite"></span>'
+                  '<button type="button" class="clear" id="secclear" hidden>解除</button></div>')
 
     heads = ['<th class="name" scope="col">銘柄</th>',
              '<th scope="col">コード</th>', '<th scope="col">業種</th>',
@@ -936,7 +1002,7 @@ def render_page(passed, allrows, cfg, meta, out_path):
         table = ('<div class="empty">今日は必須条件をすべて満たす銘柄がありませんでした。'
                  '<br>条件をゆるめたい場合は config.yml の数字を調整してください。</div>')
     else:
-        table = ('<div class="scroll main"><table id="main"><thead><tr>' + "".join(heads)
+        table = (f'<div class="scroll main"><table id="main" data-limit="{limit}"><thead><tr>' + "".join(heads)
                  + '</tr></thead><tbody>' + body + '</tbody></table></div>')
 
     alert_block = _alert_block(passed, smax)
@@ -982,11 +1048,12 @@ def render_page(passed, allrows, cfg, meta, out_path):
   <div class="stats">
     <div class="stat"><span>調べた銘柄</span><b>{meta.get('universe',0):,}</b></div>
     <div class="stat"><span>条件通過</span><b>{len(passed):,}</b></div>
-    <div class="stat"><span>表示</span><b>{len(rows):,}</b></div>
+    <div class="stat"><span>表示</span><b id="shown">{shown:,}</b></div>
     <div class="stat"><span>最高点</span><b>{int(passed['score'].max()) if len(passed) else 0}</b></div>
   </div>
+  {sec_filter}
 {alert_block}
-  <p class="hint">項目名をタップすると並べ替わります。⌄の付いた項目は点数の高い順（同点なら中身の良いほうが上）、⌃の付いた「前日比」「3営業日」は下げの大きい順です。横にスクロールできます。</p>
+  <p class="hint">業種を選ぶと、その業種の条件通過銘柄だけを表示します（「すべての業種」では合計点の上位{limit}銘柄まで）。項目名をタップすると並べ替わります。⌄の付いた項目は点数の高い順（同点なら中身の良いほうが上）、⌃の付いた「前日比」「3営業日」は下げの大きい順です。横にスクロールできます。</p>
 
 {table}
 
