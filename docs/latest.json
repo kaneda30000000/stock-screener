@@ -1,6 +1,6 @@
 {
  "meta": {
-  "updated_at": "2026-11-15T02:39:45+09:00",
+  "updated_at": "2026-11-16T06:27:44+09:00",
   "mode": "full",
   "universe": 3529,
   "price_date": "2026-11-13",
@@ -2144,29 +2144,6 @@
     "payout_ratio": 0,
     "pbr": 0,
     "equity_ratio": 0
-   }
-  },
-  {
-   "code": "7711",
-   "name": "助川電気工業",
-   "score": 105,
-   "price": 3920.0,
-   "per": 18.700505676939223,
-   "div_yield": 1.3265306122448979,
-   "points": {
-    "per": 0,
-    "q_sales_yoy": 10,
-    "q_op_yoy": 10,
-    "q_sales_progress": 0,
-    "q_op_progress": 20,
-    "drawdown": 15,
-    "range_days": 0,
-    "operating_margin": 10,
-    "profit_cagr": 15,
-    "dividend_yield": 5,
-    "payout_ratio": 10,
-    "pbr": 0,
-    "equity_ratio": 10
    }
   },
   {
