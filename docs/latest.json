@@ -1,10 +1,10 @@
 {
  "meta": {
-  "updated_at": "2026-11-16T19:06:34+09:00",
+  "updated_at": "2026-11-17T01:55:39+09:00",
   "mode": "intraday",
   "universe": 3538,
   "price_date": "2026-11-16",
-  "price_note": " ＋ 19:06時点の遅延株価で更新"
+  "price_note": " ＋ 01:55時点の遅延株価で更新"
  },
  "stocks": [
   {
@@ -419,29 +419,6 @@
     "payout_ratio": 5,
     "pbr": 0,
     "equity_ratio": 0
-   }
-  },
-  {
-   "code": "6877",
-   "name": "ＯＢＡＲＡ　ＧＲＯＵＰ",
-   "score": 150,
-   "price": 7360.0,
-   "per": 11.226186299781883,
-   "div_yield": 2.0380434782608696,
-   "points": {
-    "per": 20,
-    "q_sales_yoy": 30,
-    "q_op_yoy": 30,
-    "q_sales_progress": 10,
-    "q_op_progress": 10,
-    "drawdown": 0,
-    "range_days": 0,
-    "operating_margin": 10,
-    "profit_cagr": 5,
-    "dividend_yield": 10,
-    "payout_ratio": 10,
-    "pbr": 5,
-    "equity_ratio": 10
    }
   },
   {
@@ -1664,29 +1641,6 @@
    }
   },
   {
-   "code": "3989",
-   "name": "シェアリングテクノロジー",
-   "score": 115,
-   "price": 1537.0,
-   "per": 14.532904689863843,
-   "div_yield": 1.7891997397527653,
-   "points": {
-    "per": 10,
-    "q_sales_yoy": 20,
-    "q_op_yoy": 30,
-    "q_sales_progress": 0,
-    "q_op_progress": 10,
-    "drawdown": 0,
-    "range_days": 10,
-    "operating_margin": 10,
-    "profit_cagr": 0,
-    "dividend_yield": 5,
-    "payout_ratio": 10,
-    "pbr": 0,
-    "equity_ratio": 10
-   }
-  },
-  {
    "code": "4019",
    "name": "スタメン",
    "score": 115,
@@ -1958,29 +1912,6 @@
     "profit_cagr": 10,
     "dividend_yield": 10,
     "payout_ratio": 0,
-    "pbr": 0,
-    "equity_ratio": 10
-   }
-  },
-  {
-   "code": "4071",
-   "name": "プラスアルファ・コンサルティング",
-   "score": 110,
-   "price": 2457.0,
-   "per": 17.7734375,
-   "div_yield": 2.035002035002035,
-   "points": {
-    "per": 0,
-    "q_sales_yoy": 20,
-    "q_op_yoy": 30,
-    "q_sales_progress": 0,
-    "q_op_progress": 0,
-    "drawdown": 0,
-    "range_days": 0,
-    "operating_margin": 15,
-    "profit_cagr": 15,
-    "dividend_yield": 10,
-    "payout_ratio": 10,
     "pbr": 0,
     "equity_ratio": 10
    }
@@ -2449,9 +2380,9 @@
    "code": "6351",
    "name": "鶴見製作所",
    "score": 100,
-   "price": 2499.0,
-   "per": 15.821462488129155,
-   "div_yield": 1.440576230492197,
+   "price": 2514.0,
+   "per": 15.916429249762585,
+   "div_yield": 1.431980906921241,
    "points": {
     "per": 10,
     "q_sales_yoy": 10,
@@ -3133,29 +3064,6 @@
     "payout_ratio": 10,
     "pbr": 5,
     "equity_ratio": 5
-   }
-  },
-  {
-   "code": "4931",
-   "name": "新日本製薬",
-   "score": 80,
-   "price": 2038.0,
-   "per": 12.026436917266611,
-   "div_yield": 2.7968596663395484,
-   "points": {
-    "per": 15,
-    "q_sales_yoy": 10,
-    "q_op_yoy": 0,
-    "q_sales_progress": 0,
-    "q_op_progress": 0,
-    "drawdown": 0,
-    "range_days": 15,
-    "operating_margin": 5,
-    "profit_cagr": 5,
-    "dividend_yield": 10,
-    "payout_ratio": 10,
-    "pbr": 0,
-    "equity_ratio": 10
    }
   },
   {
