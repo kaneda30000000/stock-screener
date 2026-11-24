@@ -1,10 +1,10 @@
 {
  "meta": {
-  "updated_at": "2026-11-24T21:52:45+09:00",
+  "updated_at": "2026-11-25T03:48:17+09:00",
   "mode": "intraday",
-  "universe": 3536,
+  "universe": 3535,
   "price_date": "2026-11-24",
-  "price_note": " ＋ 21:52時点の遅延株価で更新"
+  "price_note": " ＋ 03:48時点の遅延株価で更新"
  },
  "stocks": [
   {
@@ -2078,6 +2078,29 @@
    }
   },
   {
+   "code": "3661",
+   "name": "エムアップホールディングス",
+   "score": 110,
+   "price": 895.0,
+   "per": 17.864271457085827,
+   "div_yield": 2.6815642458100557,
+   "points": {
+    "per": 0,
+    "q_sales_yoy": 30,
+    "q_op_yoy": 20,
+    "q_sales_progress": 0,
+    "q_op_progress": 20,
+    "drawdown": 5,
+    "range_days": 0,
+    "operating_margin": 10,
+    "profit_cagr": 15,
+    "dividend_yield": 10,
+    "payout_ratio": 0,
+    "pbr": 0,
+    "equity_ratio": 0
+   }
+  },
+  {
    "code": "9867",
    "name": "ソレキア",
    "score": 105,
@@ -2466,29 +2489,6 @@
     "payout_ratio": 0,
     "pbr": 0,
     "equity_ratio": 10
-   }
-  },
-  {
-   "code": "3661",
-   "name": "エムアップホールディングス",
-   "score": 105,
-   "price": 900.0,
-   "per": 17.964071856287426,
-   "div_yield": 2.666666666666667,
-   "points": {
-    "per": 0,
-    "q_sales_yoy": 30,
-    "q_op_yoy": 20,
-    "q_sales_progress": 0,
-    "q_op_progress": 20,
-    "drawdown": 0,
-    "range_days": 0,
-    "operating_margin": 10,
-    "profit_cagr": 15,
-    "dividend_yield": 10,
-    "payout_ratio": 0,
-    "pbr": 0,
-    "equity_ratio": 0
    }
   },
   {
